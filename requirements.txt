@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+httpx
+python-dotenv
+beautifulsoup4
+selenium
+webdriver-manager
+pyautogui
+openpyxl 
