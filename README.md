@@ -214,30 +214,11 @@ BTK-HACKTHON-ETİCARET/
 └── README.md              # Proje dokümantasyonu
 ```
 
-## 🎯 Yarışma Özellikleri
 
-### 🏆 BTK Hackathon Uyumluluğu
-- **Innovation**: AI-powered dropshipping automation
-- **Technology**: Modern Python stack (FastAPI, Selenium, Gemini)
-- **Scalability**: Docker containerization
-- **Documentation**: Comprehensive README and API docs
-- **Code Quality**: Clean architecture, error handling, logging
-
-### 🤖 AI Integration
-- **Gemini API**: Natural language processing
-- **SEO Optimization**: Automated content generation
-- **Smart Pricing**: Dynamic commission calculation
-- **Agent System**: Natural language commands
-
-### 🔄 Automation Features
-- **Web Scraping**: Cimri price discovery
-- **Browser Automation**: Selenium integration
-- **File Management**: Excel operations
-- **API Integration**: Multi-platform support
 
 ## 📞 İletişim
 
-- **Developer**: [Your Name]
+- **Developer**: ERKAM ÇETKİN
 - **Project**: BTK Hackathon - Otomatik Dropshipping
 - **Year**: 2025
 
