@@ -1,231 +1,270 @@
-# 🚀 BTK Hackathon - Otomatik Dropshipping Sistemi
+# 🔍 Akıllı Kitap Fiyat Karşılaştırma ve Satış Analizi API
 
-## 📖 Proje Amacı
-Bu proje, BTK Hackathon yarışması için geliştirilmiş **tam otomatik yerel dropshipping sistemi**dir. Kullanıcıdan alınan kitap ismine göre:
+Bu proje, kitap adını girdiğinizde Google Shopping üzerinden tüm e-ticaret sitelerinde arama yaparak en uygun fiyatlı kitabı bulan, Gemini AI ile detaylı analiz yapan ve Excel raporu oluşturan gelişmiş bir FastAPI uygulamasıdır.
 
-1. **Cimri'den en uygun fiyatı bulur**
-2. **Gemini API ile SEO dostu başlık ve açıklama üretir**
-3. **Otomatik fiyatlandırma yapar** (%21 komisyon + 70 TL kargo + 100 TL kar)
-4. **Excel dosyasına yazar**
-5. **Trendyol'a otomatik yükler** (API + Selenium + Sürükle-bırak)
+## 🎯 Özellikler
 
-## 🛠️ Teknolojiler
+### 🔍 Akıllı Arama
+- **🌐 Google Shopping Entegrasyonu**: SerpAPI ile gerçek zamanlı fiyat arama
+- **💰 En İyi Fiyat Bulma**: Tüm platformlardan en düşük fiyatlı seçeneği otomatik seçme
+- **📊 Fiyat Karşılaştırma**: Detaylı platform bazlı fiyat analizi
+- **🔗 URL Yönetimi**: Eksik URL'leri otomatik oluşturma
 
-### Backend
-- **FastAPI** - Modern web framework
-- **Python 3.10+** - Ana programlama dili
-- **Uvicorn** - ASGI server
+### 🧠 Gelişmiş AI Analizi
+- **📝 Kitap Analizi**: Popülerlik, talep durumu, hedef kitle analizi
+- **🔍 SEO İçeriği**: Başlık, meta açıklama, ürün açıklaması üretimi
+- **💰 Satış Önerileri**: Platform önerileri ve satış stratejileri
+- **📈 Kar Analizi**: Otomatik kar hesaplama ve rekabet analizi
 
-### Web Scraping & Automation
-- **httpx** - Asenkron HTTP client
-- **BeautifulSoup4** - HTML parsing
-- **Selenium** - Web automation
-- **PyAutoGUI** - Mouse/keyboard automation
+### 📊 Excel Raporlama
+- **📋 Özet Sayfası**: Kitap bilgileri ve satış uygunluğu
+- **📈 Fiyat Karşılaştırma**: Tüm platformların fiyat tablosu
+- **💰 Kar Analizi**: Detaylı maliyet ve kar hesaplamaları
+- **📝 Detaylı Analiz**: Gemini AI analizlerinin tam metni
 
-### AI & Content Generation
-- **Google Gemini API** - SEO dostu içerik üretimi
-- **Natural Language Processing** - Akıllı başlık ve açıklama
+### 🎯 Satış Optimizasyonu
+- **💡 Rekabet Analizi**: En pahalı rakip fiyatı ile karşılaştırma
+- **📊 Kar Marjı Testi**: 50-150 TL arası farklı kar marjları
+- **⚡ Satış Uygunluğu**: Otomatik satış önerisi
+- **🎯 Optimal Fiyat**: Rekabetçi fiyat önerisi
 
-### Data Management
-- **openpyxl** - Excel dosya işlemleri
-- **Pydantic** - Data validation
-- **python-dotenv** - Environment variables
+## 🛠️ Kullanılan Teknolojiler
 
-### Deployment
-- **Docker** - Containerization
-- **Docker Compose** - Multi-container setup
+### Backend Framework
+- **FastAPI**: Modern, hızlı web framework
+- **Python 3.10+**: Güncel Python sürümü
+- **Uvicorn**: ASGI server
 
-## 🚀 Kurulum
+### AI ve Machine Learning
+- **Google Gemini AI**: Doğal dil işleme ve içerik üretimi
+- **Google Generative AI**: Python kütüphanesi
 
-### 1. Repository'yi Klonla
+### Web Scraping ve API
+- **SerpAPI**: Google Shopping arama API'si
+- **httpx**: Asenkron HTTP client
+- **BeautifulSoup4**: HTML parsing (geçmiş versiyonlarda)
+
+### Veri İşleme ve Raporlama
+- **Pandas**: Veri analizi ve manipülasyon
+- **OpenPyXL**: Excel dosya oluşturma ve düzenleme
+- **Pydantic**: Veri validasyonu ve serialization
+
+### Frontend
+- **HTML5**: Modern web standartları
+- **CSS3**: Responsive tasarım
+- **JavaScript**: Dinamik kullanıcı etkileşimi
+
+### Environment ve Konfigürasyon
+- **python-dotenv**: Environment variables yönetimi
+- **Docker**: Containerization (opsiyonel)
+
+## 📦 Kurulum
+
+### 1. Projeyi Klonlayın
 ```bash
-git clone https://github.com/your-username/btk-hackathon-dropshipping.git
-cd btk-hackathon-dropshipping
+git clone <repository-url>
+cd BTK-HACKTHON-ETİCARET
 ```
 
-### 2. Environment Variables
-`.env` dosyası oluşturun:
-```env
-GEMINI_API_KEY=your_gemini_api_key_here
-TRENDYOL_API_KEY=your_trendyol_api_key_here
-TRENDYOL_SUPPLIER_ID=your_supplier_id_here
-TRENDYOL_EMAIL=your_trendyol_email@example.com
-TRENDYOL_PASSWORD=your_trendyol_password_here
-```
-
-### 3. Dependencies Yükle
+### 2. Gerekli Paketleri Yükleyin
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Chrome Tarayıcısı
-- Google Chrome yüklü olmalı
-- Selenium otomatik olarak ChromeDriver'ı indirecek
+### 3. Environment Variables Ayarlayın
+`env.example` dosyasını `.env` olarak kopyalayın:
 
-## 🎯 Kullanım
-
-### Docker ile Çalıştırma
 ```bash
-# Build image
-docker build -t btk-dropshipping .
-
-# Run container
-docker run -p 8000:8000 btk-dropshipping
+cp env.example .env
 ```
 
-### Local Çalıştırma
+`.env` dosyasını düzenleyin:
+```env
+# Gemini AI API Key (Google AI Studio'dan alın)
+GEMINI_API_KEY=your_gemini_api_key_here
+
+# SerpAPI Key (https://serpapi.com/ adresinden alın)
+SERP_API_KEY=your_serp_api_key_here
+```
+
+### 4. Uygulamayı Çalıştırın
 ```bash
-# FastAPI server başlat
-python -m uvicorn app.main:app --reload
-
-# API docs: http://localhost:8000/docs
+python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-### API Endpoint
+## 🌐 API Endpoints
+
+### Ana Sayfa
+- `GET /` - Web arayüzü
+
+### Kitap Arama ve Analiz
+- `POST /search-book` - Kitap ara, analiz et ve Excel raporu oluştur
+
+### API Dokümantasyonu
+- `GET /docs` - Swagger UI dokümantasyonu
+- `GET /redoc` - ReDoc dokümantasyonu
+
+## 📖 Kullanım
+
+### Web Arayüzü
+1. Tarayıcınızda `http://localhost:8000` adresine gidin
+2. Kitap adını girin (örn: "Beyaz Geceler")
+3. "🔍 Kitap Ara" butonuna tıklayın
+4. Detaylı analizi ve Excel raporunu görün
+
+### API Kullanımı
 ```bash
-POST /add-book
-Content-Type: application/json
-
-{
-  "book_name": "satranç"
-}
+# Kitap ara ve analiz et
+curl -X POST "http://localhost:8000/search-book" \
+     -H "Content-Type: application/json" \
+     -d '{"book_name": "Beyaz Geceler"}'
 ```
 
-## 📊 Sistem Mimarisi
+## 🔧 API Key Alma
 
-```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   User Input    │───▶│   FastAPI       │───▶│   Cimri Scraper │
-│   (Book Name)   │    │   Endpoint      │    │   (Price Fetch) │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-                                │
-                                ▼
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Excel Writer  │◀───│   Price Calc    │◀───│   Gemini API    │
-│   (Product Add) │    │   (Commission)  │    │   (SEO Content) │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-                                │
-                                ▼
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Trendyol API  │◀───│   Auto Upload   │◀───│   Selenium Bot  │
-│   (Direct API)  │    │   (Multi-Method)│    │   (Browser Auto)│
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-```
+### Gemini AI API Key
+1. [Google AI Studio](https://makersuite.google.com/app/apikey) adresine gidin
+2. Google hesabınızla giriş yapın
+3. "Create API Key" butonuna tıklayın
+4. Oluşturulan API key'i `.env` dosyasına ekleyin
 
-## 🔧 Özellikler
-
-### 🤖 Otomatik Fiyatlandırma
-- **Base Price**: Cimri'den çekilen fiyat
-- **Commission**: %21 komisyon
-- **Shipping**: 70 TL kargo
-- **Profit**: 100 TL kar
-- **Market Price**: Trendyol fiyatından 50-100 TL yüksek
-
-### 📝 Akıllı İçerik Üretimi
-- **SEO Optimized Titles**: Gemini API ile üretilen başlıklar
-- **Rich Descriptions**: 3-4 paragraf detaylı açıklama
-- **Keyword Integration**: "kitap", "okuma", "edebiyat" anahtar kelimeleri
-
-### 🔄 Çoklu Yükleme Yöntemi
-1. **Trendyol API** (Direkt)
-2. **Selenium Automation** (Browser)
-3. **Drag & Drop** (File upload)
-4. **Manual Instructions** (Fallback)
-
-### 📊 Excel Entegrasyonu
-- **Roman_27_07_2025-21_23.xlsx** formatı
-- **30+ field mapping**
-- **Automatic barcode generation**
-- **Dynamic stock quantities**
-
-## 🎯 API Response Örneği
-
-```json
-{
-  "book_info": {
-    "title": "satranç",
-    "price": 35.62,
-    "url": "https://www.kitapyurdu.com/kitap/satranç",
-    "image_url": "https://img.kitapyurdu.com/v1/getImage/fn:999999/wi:60/wh:true",
-    "author": "Bilinmeyen Yazar"
-  },
-  "base_price": 35.62,
-  "market_price": 283.25,
-  "trendyol_price": 213.1,
-  "gemini_result": {
-    "title": "satranç Kitap",
-    "description": "SEO dostu açıklama..."
-  },
-  "trendyol_result": {
-    "status": "success",
-    "message": "Ürün Excel dosyasına eklendi. Otomatik yükleme başarılı!"
-  }
-}
-```
-
-## 🚀 Deployment
-
-### Docker Compose
-```yaml
-version: '3.8'
-services:
-  app:
-    build: .
-    ports:
-      - "8000:8000"
-    environment:
-      - GEMINI_API_KEY=${GEMINI_API_KEY}
-      - TRENDYOL_API_KEY=${TRENDYOL_API_KEY}
-      - TRENDYOL_SUPPLIER_ID=${TRENDYOL_SUPPLIER_ID}
-```
-
-### Production
-```bash
-# Build production image
-docker build -t btk-dropshipping:prod .
-
-# Run with environment variables
-docker run -d \
-  -p 8000:8000 \
-  --env-file .env \
-  btk-dropshipping:prod
-```
+### SerpAPI Key
+1. [SerpAPI](https://serpapi.com/) adresine gidin
+2. Ücretsiz hesap oluşturun
+3. API key'inizi alın
+4. `.env` dosyasına ekleyin
 
 ## 📁 Proje Yapısı
 
 ```
 BTK-HACKTHON-ETİCARET/
 ├── app/
-│   ├── __init__.py
-│   ├── main.py              # FastAPI ana uygulama
-│   ├── fetch_price.py       # Cimri scraping
-│   ├── gemini_agent.py      # AI içerik üretimi
-│   ├── trendyol_api.py      # Trendyol entegrasyonu
-│   ├── auto_upload.py       # Selenium automation
-│   ├── schemas.py           # Pydantic modelleri
-│   ├── config.py            # Konfigürasyon
-│   └── utils.py             # Yardımcı fonksiyonlar
-├── Roman_27_07_2025-21_23.xlsx  # Excel template
-├── requirements.txt         # Python dependencies
-├── Dockerfile              # Docker image
-├── docker-compose.yml      # Multi-container setup
-├── .env                    # Environment variables (gitignore)
-├── .gitignore             # Git ignore rules
-└── README.md              # Proje dokümantasyonu
+│   ├── main.py                 # FastAPI ana uygulama
+│   ├── serp_agent.py           # SerpAPI entegrasyonu
+│   ├── gemini_agent_v2.py      # Gelişmiş Gemini AI entegrasyonu
+│   ├── excel_generator.py      # Excel rapor oluşturucu
+│   └── schemas.py              # Pydantic modelleri
+├── reports/                    # Excel raporları (otomatik oluşturulur)
+├── requirements.txt            # Python bağımlılıkları
+├── env.example                 # Örnek environment variables
+├── Dockerfile                  # Docker konfigürasyonu
+├── docker-compose.yml          # Docker Compose
+└── README.md                   # Bu dosya
 ```
 
+<<<<<<< HEAD
 
+=======
+## 🚀 Örnek Çıktı
 
-## 📞 İletişim
+### API Response
+```json
+{
+  "success": true,
+  "search_results": {
+    "serpapi": [
+      {
+        "title": "Beyaz Geceler",
+        "price": 33.0,
+        "url": "https://www.kitapyurdu.com/kitap/beyaz-geceler",
+        "platform": "Kitapyurdu",
+        "original_price": "₺33,00"
+      }
+    ]
+  },
+  "best_offer": {
+    "title": "Beyaz Geceler",
+    "price": 33.0,
+    "platform": "Kitapyurdu"
+  },
+  "gemini_analysis": {
+    "analysis": "Kitap analizi...",
+    "seo_content": "SEO içeriği...",
+    "sales_recommendation": "Satış önerileri...",
+    "profit_analysis": "Kar analizi..."
+  },
+  "excel_report": "reports/kitap_analizi_Beyaz_Geceler_20241201_143022.xlsx"
+}
+```
 
+### Excel Raporu İçeriği
+- **Özet Sayfası**: Kitap bilgileri ve satış uygunluğu
+- **Fiyat Karşılaştırma**: Tüm platformların fiyat tablosu
+- **Kar Analizi**: Maliyet hesaplama ve kar marjı analizi
+- **Detaylı Analiz**: Gemini AI analizlerinin tam metni
+
+## 💰 Kar Hesaplama Formülü
+>>>>>>> a40c44e (v2: gelişmiş kitap analiz sistemine geçildi)
+
+```
+Alış Fiyatı: [En ucuz platform fiyatı]
+Kargo Maliyeti: 70 TL (sabit)
+Komisyon: %21 (Trendyol/Shopify)
+Kar Marjı: 100 TL (varsayılan)
+
+<<<<<<< HEAD
 - **Developer**: ERKAM ÇETKİN
 - **Project**: BTK Hackathon - Otomatik Dropshipping
 - **Year**: 2025
+=======
+Toplam Maliyet = Alış Fiyatı + Kargo
+Komisyon Tutarı = (Alış Fiyatı + Kar Marjı) × %21
+Önerilen Satış Fiyatı = Toplam Maliyet + Komisyon Tutarı + Kar Marjı
+Net Kar = Önerilen Satış Fiyatı - Toplam Maliyet
+```
+
+## 🎯 Özellik Detayları
+
+### Akıllı Rekabet Analizi
+- En pahalı rakip fiyatı ile karşılaştırma
+- Farklı kar marjları ile test (50, 75, 100, 125, 150 TL)
+- Rekabet edebilir mi? analizi
+- Optimal fiyat önerisi
+
+### Gelişmiş Fiyat Çıkarma
+- Farklı fiyat formatlarını destekler (1.850,00, 1,850.00, 1850)
+- Binlik ayırıcı otomatik algılama
+- TL işareti ve para birimi tanıma
+- Hata durumunda fallback mekanizması
+
+### Profesyonel Excel Raporu
+- 4 sayfa detaylı analiz
+- Renkli başlıklar ve tablolar
+- Otomatik sütun genişlikleri
+- Timestamp ile dosya adlandırma
+
+## 🤝 Katkıda Bulunma
+
+1. Fork yapın
+2. Feature branch oluşturun (`git checkout -b feature/amazing-feature`)
+3. Commit yapın (`git commit -m 'Add amazing feature'`)
+4. Push yapın (`git push origin feature/amazing-feature`)
+5. Pull Request oluşturun
+>>>>>>> a40c44e (v2: gelişmiş kitap analiz sistemine geçildi)
 
 ## 📄 Lisans
 
-Bu proje BTK Hackathon yarışması için geliştirilmiştir.
+Bu proje BTK Hackathon kapsamında geliştirilmiştir.
 
----
+## 📞 İletişim
 
+<<<<<<< HEAD
 ⭐ **Star this repository if you find it useful!** 
+=======
+Proje hakkında sorularınız için issue açabilirsiniz.
+
+## 🔄 Güncelleme Geçmişi
+
+### v2.0.0 (Güncel)
+- ✅ SerpAPI entegrasyonu
+- ✅ Gelişmiş Gemini AI analizi
+- ✅ Excel rapor oluşturma
+- ✅ Akıllı kar hesaplama
+- ✅ Rekabet analizi
+- ✅ Profesyonel web arayüzü
+
+### v1.0.0 (Önceki)
+- ✅ Temel web scraping
+- ✅ Basit Gemini AI entegrasyonu
+- ✅ Temel fiyat karşılaştırma 
+>>>>>>> a40c44e (v2: gelişmiş kitap analiz sistemine geçildi)

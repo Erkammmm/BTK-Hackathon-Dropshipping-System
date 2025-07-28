@@ -1,6 +1,9 @@
 from pydantic import BaseModel
 from typing import Optional
 
+class BookRequest(BaseModel):
+    book_name: str
+
 class BookInfo(BaseModel):
     title: str
     author: Optional[str]
