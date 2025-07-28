@@ -1,21 +1,29 @@
 version: '3.8'
 
 services:
-  btk-dropshipping:
+  btk-kitap-analizi:
     build: .
+    container_name: btk-kitap-analizi
     ports:
       - "8000:8000"
     environment:
       - GEMINI_API_KEY=${GEMINI_API_KEY}
-      - TRENDYOL_API_KEY=${TRENDYOL_API_KEY}
-      - TRENDYOL_SUPPLIER_ID=${TRENDYOL_SUPPLIER_ID}
-      - TRENDYOL_EMAIL=${TRENDYOL_EMAIL}
-      - TRENDYOL_PASSWORD=${TRENDYOL_PASSWORD}
+      - SERP_API_KEY=${SERP_API_KEY}
     volumes:
-      - ./Roman_27_07_2025-21_23.xlsx:/app/Roman_27_07_2025-21_23.xlsx
+      # Reports klasörünü host'a bağla
+      - ./reports:/app/reports
+      # Environment dosyasını bağla
+      - ./.env:/app/.env
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/docs"]
       interval: 30s
       timeout: 10s
-      retries: 3 
+      retries: 3
+      start_period: 40s
+    networks:
+      - btk-network
+
+networks:
+  btk-network:
+    driver: bridge 

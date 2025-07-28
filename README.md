@@ -152,9 +152,6 @@ BTK-HACKTHON-ETİCARET/
 └── README.md                   # Bu dosya
 ```
 
-<<<<<<< HEAD
-
-=======
 ## 🚀 Örnek Çıktı
 
 ### API Response
@@ -194,7 +191,6 @@ BTK-HACKTHON-ETİCARET/
 - **Detaylı Analiz**: Gemini AI analizlerinin tam metni
 
 ## 💰 Kar Hesaplama Formülü
->>>>>>> a40c44e (v2: gelişmiş kitap analiz sistemine geçildi)
 
 ```
 Alış Fiyatı: [En ucuz platform fiyatı]
@@ -202,11 +198,6 @@ Kargo Maliyeti: 70 TL (sabit)
 Komisyon: %21 (Trendyol/Shopify)
 Kar Marjı: 100 TL (varsayılan)
 
-<<<<<<< HEAD
-- **Developer**: ERKAM ÇETKİN
-- **Project**: BTK Hackathon - Otomatik Dropshipping
-- **Year**: 2025
-=======
 Toplam Maliyet = Alış Fiyatı + Kargo
 Komisyon Tutarı = (Alış Fiyatı + Kar Marjı) × %21
 Önerilen Satış Fiyatı = Toplam Maliyet + Komisyon Tutarı + Kar Marjı
@@ -240,7 +231,6 @@ Net Kar = Önerilen Satış Fiyatı - Toplam Maliyet
 3. Commit yapın (`git commit -m 'Add amazing feature'`)
 4. Push yapın (`git push origin feature/amazing-feature`)
 5. Pull Request oluşturun
->>>>>>> a40c44e (v2: gelişmiş kitap analiz sistemine geçildi)
 
 ## 📄 Lisans
 
@@ -248,9 +238,6 @@ Bu proje BTK Hackathon kapsamında geliştirilmiştir.
 
 ## 📞 İletişim
 
-<<<<<<< HEAD
-⭐ **Star this repository if you find it useful!** 
-=======
 Proje hakkında sorularınız için issue açabilirsiniz.
 
 ## 🔄 Güncelleme Geçmişi
@@ -266,5 +253,4 @@ Proje hakkında sorularınız için issue açabilirsiniz.
 ### v1.0.0 (Önceki)
 - ✅ Temel web scraping
 - ✅ Basit Gemini AI entegrasyonu
-- ✅ Temel fiyat karşılaştırma 
->>>>>>> a40c44e (v2: gelişmiş kitap analiz sistemine geçildi)
+- ✅ Temel fiyat karşılaştırma
