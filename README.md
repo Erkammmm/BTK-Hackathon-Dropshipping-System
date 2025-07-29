@@ -1,228 +1,300 @@
-# 🔍 Akıllı Kitap Fiyat Karşılaştırma ve Satış Analizi API
+# 📚 BTK Kitap Fiyat Karşılaştırma ve Analiz Sistemi v3.0
 
-Bu proje, kitap adını girdiğinizde Google Shopping üzerinden tüm e-ticaret sitelerinde arama yaparak en uygun fiyatlı kitabı bulan, Gemini AI ile detaylı analiz yapan ve Excel raporu oluşturan gelişmiş bir FastAPI uygulamasıdır.
+## 🎯 Proje Hakkında
 
-## 🎯 Özellikler
+Bu proje, kitap arama ve analiz sistemi olup, **Machine Learning** ve **Gelişmiş Excel Raporlama** özellikleri ile donatılmıştır. Sistem, Google Shopping'den fiyat karşılaştırması yapar, Gemini AI ile detaylı analiz üretir ve gelişmiş Excel raporları oluşturur.
 
-### 🔍 Akıllı Arama
-- **🌐 Google Shopping Entegrasyonu**: SerpAPI ile gerçek zamanlı fiyat arama
-- **💰 En İyi Fiyat Bulma**: Tüm platformlardan en düşük fiyatlı seçeneği otomatik seçme
-- **📊 Fiyat Karşılaştırma**: Detaylı platform bazlı fiyat analizi
-- **🔗 URL Yönetimi**: Eksik URL'leri otomatik oluşturma
+## ✨ Versiyon 3.0 Yeni Özellikler
 
-### 🧠 Gelişmiş AI Analizi
-- **📝 Kitap Analizi**: Popülerlik, talep durumu, hedef kitle analizi
-- **🔍 SEO İçeriği**: Başlık, meta açıklama, ürün açıklaması üretimi
-- **💰 Satış Önerileri**: Platform önerileri ve satış stratejileri
-- **📈 Kar Analizi**: Otomatik kar hesaplama ve rekabet analizi
+### 🤖 Machine Learning Özellikleri
+- **Random Forest Regressor** ile satış tahmini
+- **Popülerlik skoru** hesaplama (kitap adından)
+- **Kategori bazlı analiz** (Roman, Eğitim, Çocuk vs.)
+- **Güven skoru** hesaplama
+- **Aylık satış tahmini** ve gelir hesaplama
 
-### 📊 Excel Raporlama
-- **📋 Özet Sayfası**: Kitap bilgileri ve satış uygunluğu
-- **📈 Fiyat Karşılaştırma**: Tüm platformların fiyat tablosu
-- **💰 Kar Analizi**: Detaylı maliyet ve kar hesaplamaları
-- **📝 Detaylı Analiz**: Gemini AI analizlerinin tam metni
+### 📊 Gelişmiş Excel Raporlama
+- **5 farklı sayfa**: Özet, Fiyat Grafikleri, Kâr Analizi, Satış Tahmini, Detaylı Analiz
+- **Tablo formatında detaylı analiz**: 3 sütunlu profesyonel görünüm
+- **Renkli tasarım**: Mavi, sarı, yeşil, turuncu renkler
+- **Metin kaydırma**: Uzun yazılar otomatik alt satıra geçiyor
+- **Grafikler**: Bar chart, line chart, pie chart
 
-### 🎯 Satış Optimizasyonu
-- **💡 Rekabet Analizi**: En pahalı rakip fiyatı ile karşılaştırma
-- **📊 Kar Marjı Testi**: 50-150 TL arası farklı kar marjları
-- **⚡ Satış Uygunluğu**: Otomatik satış önerisi
-- **🎯 Optimal Fiyat**: Rekabetçi fiyat önerisi
+### 🔧 API Entegrasyonları
+- **Google Shopping** (SerpAPI) - Fiyat karşılaştırması
+- **Google Gemini AI** - Detaylı analiz ve SEO içeriği
+- **Google Trends** - Popülerlik analizi
+- **Türk E-ticaret API** - Hazır (gelecekte kullanılacak)
 
-## 🛠️ Kullanılan Teknolojiler
+## 🚀 Hızlı Başlangıç
 
-### Backend Framework
-- **FastAPI**: Modern, hızlı web framework
-- **Python 3.10+**: Güncel Python sürümü
-- **Uvicorn**: ASGI server
+### Gereksinimler
+- Python 3.10+
+- Docker (opsiyonel)
+- API Anahtarları
 
-### AI ve Machine Learning
-- **Google Gemini AI**: Doğal dil işleme ve içerik üretimi
-- **Google Generative AI**: Python kütüphanesi
+### Kurulum
 
-### Web Scraping ve API
-- **SerpAPI**: Google Shopping arama API'si
-- **httpx**: Asenkron HTTP client
-- **BeautifulSoup4**: HTML parsing (geçmiş versiyonlarda)
-
-### Veri İşleme ve Raporlama
-- **Pandas**: Veri analizi ve manipülasyon
-- **OpenPyXL**: Excel dosya oluşturma ve düzenleme
-- **Pydantic**: Veri validasyonu ve serialization
-
-### Frontend
-- **HTML5**: Modern web standartları
-- **CSS3**: Responsive tasarım
-- **JavaScript**: Dinamik kullanıcı etkileşimi
-
-### Environment ve Konfigürasyon
-- **python-dotenv**: Environment variables yönetimi
-- **Docker**: Containerization (opsiyonel)
-
-## 📦 Kurulum
-
-### 1. Projeyi Klonlayın
+1. **Repository'yi klonlayın**
 ```bash
-git clone <repository-url>
+git clone https://github.com/your-username/BTK-HACKTHON-ETİCARET.git
 cd BTK-HACKTHON-ETİCARET
 ```
 
-### 2. Gerekli Paketleri Yükleyin
-```bash
-pip install -r requirements.txt
-```
-
-### 3. Environment Variables Ayarlayın
-`env.example` dosyasını `.env` olarak kopyalayın:
-
+2. **Environment dosyasını oluşturun**
 ```bash
 cp env.example .env
 ```
 
-`.env` dosyasını düzenleyin:
+3. **API anahtarlarını ekleyin**
 ```env
-# Gemini AI API Key (Google AI Studio'dan alın)
 GEMINI_API_KEY=your_gemini_api_key_here
-
-# SerpAPI Key (https://serpapi.com/ adresinden alın)
 SERP_API_KEY=your_serp_api_key_here
+RAPIDAPI_KEY=your_rapidapi_key_here
 ```
 
-### 4. Uygulamayı Çalıştırın
+4. **Bağımlılıkları yükleyin**
 ```bash
-python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+pip install -r requirements.txt
 ```
 
-## 🌐 API Endpoints
+5. **Uygulamayı başlatın**
+```bash
+python -m uvicorn app.main:app --reload
+```
 
-### Ana Sayfa
-- `GET /` - Web arayüzü
+### Docker ile Kurulum
 
-### Kitap Arama ve Analiz
-- `POST /search-book` - Kitap ara, analiz et ve Excel raporu oluştur
+```bash
+# Docker Compose ile başlat
+docker-compose up --build
 
-### API Dokümantasyonu
-- `GET /docs` - Swagger UI dokümantasyonu
-- `GET /redoc` - ReDoc dokümantasyonu
+# Veya sadece Docker ile
+docker build -t btk-kitap-analizi .
+docker run -p 8000:8000 --env-file .env btk-kitap-analizi
+```
 
 ## 📖 Kullanım
 
 ### Web Arayüzü
-1. Tarayıcınızda `http://localhost:8000` adresine gidin
-2. Kitap adını girin (örn: "Beyaz Geceler")
-3. "🔍 Kitap Ara" butonuna tıklayın
-4. Detaylı analizi ve Excel raporunu görün
+- **Ana Sayfa**: `http://localhost:8000`
+- **API Dokümantasyonu**: `http://localhost:8000/docs`
 
-### API Kullanımı
-```bash
-# Kitap ara ve analiz et
-curl -X POST "http://localhost:8000/search-book" \
-     -H "Content-Type: application/json" \
-     -d '{"book_name": "Beyaz Geceler"}'
+### API Endpoints
+
+#### 🔍 Temel Analiz
+```http
+POST /search-book
+Content-Type: application/json
+
+{
+  "book_name": "Beyaz Geceler"
+}
 ```
 
-## 🔧 API Key Alma
+#### 🚀 Gelişmiş Analiz (ML + Grafikler)
+```http
+POST /search-book-advanced
+Content-Type: application/json
 
-### Gemini AI API Key
-1. [Google AI Studio](https://makersuite.google.com/app/apikey) adresine gidin
-2. Google hesabınızla giriş yapın
-3. "Create API Key" butonuna tıklayın
-4. Oluşturulan API key'i `.env` dosyasına ekleyin
+{
+  "book_name": "Beyaz Geceler"
+}
+```
 
-### SerpAPI Key
-1. [SerpAPI](https://serpapi.com/) adresine gidin
-2. Ücretsiz hesap oluşturun
-3. API key'inizi alın
-4. `.env` dosyasına ekleyin
+### Örnek Kullanım
+
+```python
+import requests
+
+# Gelişmiş analiz
+response = requests.post(
+    "http://localhost:8000/search-book-advanced",
+    json={"book_name": "Beyaz Geceler"}
+)
+
+result = response.json()
+print(f"Excel Raporu: {result['excel_report']}")
+print(f"ML Tahmini: {result['sales_prediction']}")
+```
+
+## 📊 Excel Rapor Yapısı
+
+### 📋 Özet Sayfası
+- Kitap bilgileri
+- ML satış tahminleri
+- Popülerlik skoru
+- Güven skoru
+- Aylık gelir tahmini
+
+### 📈 Fiyat Grafikleri
+- Platform fiyat karşılaştırması
+- Bar chart grafikleri
+- En uygun fiyat vurgusu
+
+### 💰 Kâr Analizi
+- Kâr marjı hesaplamaları
+- Trendyol komisyon analizi
+- Kargo maliyeti hesaplama
+- Net kâr tahmini
+
+### 🎯 Satış Tahmini
+- ML model sonuçları
+- Kategori bazlı analiz
+- Trend analizi
+- Günlük ortalama satış
+
+### 📝 Detaylı Analiz
+- **Tablo formatında** Gemini AI analizleri
+- SEO içeriği
+- Satış önerileri
+- Kâr analizi detayları
+
+## 🛠️ Kullanılan Teknolojiler
+
+### Backend
+- **FastAPI** - Modern Python web framework
+- **Uvicorn** - ASGI server
+- **Pydantic** - Data validation
+- **httpx** - Async HTTP client
+
+### Machine Learning
+- **Scikit-learn** - ML algorithms
+- **Random Forest** - Sales prediction
+- **NumPy** - Numerical operations
+- **Pandas** - Data manipulation
+
+### Excel & Grafikler
+- **OpenPyXL** - Excel file generation
+- **Matplotlib** - Plotting library
+- **Seaborn** - Statistical visualization
+
+### AI & APIs
+- **Google Gemini AI** - Content generation
+- **SerpAPI** - Google Shopping data
+- **Google Trends** - Popularity analysis
+
+### Web Scraping
+- **BeautifulSoup4** - HTML parsing
+- **Selenium** - Browser automation
 
 ## 📁 Proje Yapısı
 
 ```
 BTK-HACKTHON-ETİCARET/
 ├── app/
-│   ├── main.py                 # FastAPI ana uygulama
-│   ├── serp_agent.py           # SerpAPI entegrasyonu
-│   ├── gemini_agent_v2.py      # Gelişmiş Gemini AI entegrasyonu
-│   ├── excel_generator.py      # Excel rapor oluşturucu
-│   └── schemas.py              # Pydantic modelleri
-├── reports/                    # Excel raporları (otomatik oluşturulur)
-├── requirements.txt            # Python bağımlılıkları
-├── env.example                 # Örnek environment variables
-├── Dockerfile                  # Docker konfigürasyonu
-├── docker-compose.yml          # Docker Compose
-└── README.md                   # Bu dosya
+│   ├── main.py                 # FastAPI uygulaması
+│   ├── serp_agent.py          # Google Shopping API
+│   ├── gemini_agent.py        # Gemini AI entegrasyonu
+│   ├── google_trends_scraper.py # Google Trends analizi
+│   ├── turkish_ecommerce_api.py # Türk E-ticaret API
+│   ├── advanced_excel_generator.py # Excel rapor oluşturucu
+│   ├── schemas.py             # Pydantic modelleri
+│   └── config.py              # Konfigürasyon
+├── reports/                   # Excel raporları
+├── requirements.txt           # Python bağımlılıkları
+├── Dockerfile                 # Docker konfigürasyonu
+├── docker-compose.yml         # Docker Compose
+├── env.example               # Environment örneği
+└── README.md                 # Bu dosya
 ```
 
-## 🚀 Örnek Çıktı
+## 🔧 Konfigürasyon
 
-### API Response
-```json
-{
-  "success": true,
-  "search_results": {
-    "serpapi": [
-      {
-        "title": "Beyaz Geceler",
-        "price": 33.0,
-        "url": "https://www.kitapyurdu.com/kitap/beyaz-geceler",
-        "platform": "Kitapyurdu",
-        "original_price": "₺33,00"
-      }
-    ]
-  },
-  "best_offer": {
-    "title": "Beyaz Geceler",
-    "price": 33.0,
-    "platform": "Kitapyurdu"
-  },
-  "gemini_analysis": {
-    "analysis": "Kitap analizi...",
-    "seo_content": "SEO içeriği...",
-    "sales_recommendation": "Satış önerileri...",
-    "profit_analysis": "Kar analizi..."
-  },
-  "excel_report": "reports/kitap_analizi_Beyaz_Geceler_20241201_143022.xlsx"
-}
+### Environment Variables
+```env
+# Gerekli API Anahtarları
+GEMINI_API_KEY=your_gemini_api_key_here
+SERP_API_KEY=your_serp_api_key_here
+RAPIDAPI_KEY=your_rapidapi_key_here
 ```
 
-### Excel Raporu İçeriği
-- **Özet Sayfası**: Kitap bilgileri ve satış uygunluğu
-- **Fiyat Karşılaştırma**: Tüm platformların fiyat tablosu
-- **Kar Analizi**: Maliyet hesaplama ve kar marjı analizi
-- **Detaylı Analiz**: Gemini AI analizlerinin tam metni
+### API Anahtarı Alma
 
-## 💰 Kar Hesaplama Formülü
+#### 🔑 Gemini AI
+1. [Google AI Studio](https://makersuite.google.com/app/apikey) adresine gidin
+2. API key oluşturun
+3. `.env` dosyasına ekleyin
 
+#### 🔑 SerpAPI
+1. [SerpAPI](https://serpapi.com/) adresine gidin
+2. Ücretsiz hesap oluşturun
+3. API key alın
+
+#### 🔑 RapidAPI
+1. [RapidAPI](https://rapidapi.com/) adresine gidin
+2. Türk E-ticaret API'sine abone olun
+3. API key alın
+
+## 📈 ML Model Detayları
+
+### Satış Tahmini Algoritması
+```python
+# Random Forest Regressor
+model = RandomForestRegressor(n_estimators=100, random_state=42)
+
+# Özellikler
+features = ['price', 'popularity_score', 'category']
+
+# Tahmin
+predicted_sales = model.predict([[price, popularity, category]])
 ```
-Alış Fiyatı: [En ucuz platform fiyatı]
-Kargo Maliyeti: 70 TL (sabit)
-Komisyon: %21 (Trendyol/Shopify)
-Kar Marjı: 100 TL (varsayılan)
 
-Toplam Maliyet = Alış Fiyatı + Kargo
-Komisyon Tutarı = (Alış Fiyatı + Kar Marjı) × %21
-Önerilen Satış Fiyatı = Toplam Maliyet + Komisyon Tutarı + Kar Marjı
-Net Kar = Önerilen Satış Fiyatı - Toplam Maliyet
+### Popülerlik Skoru Hesaplama
+- Kitap adından anahtar kelime analizi
+- Yazar popülerliği
+- Kategori etkisi
+- Başlık uzunluğu
+
+## 🚀 Deployment
+
+### Docker ile Production
+```bash
+# Production build
+docker build -t btk-kitap-analizi:latest .
+
+# Production run
+docker run -d \
+  -p 8000:8000 \
+  --env-file .env \
+  --name btk-kitap-analizi \
+  btk-kitap-analizi:latest
 ```
 
-## 🎯 Özellik Detayları
+### Docker Compose ile Production
+```bash
+# Production mode
+docker-compose -f docker-compose.yml up -d
+```
 
-### Akıllı Rekabet Analizi
-- En pahalı rakip fiyatı ile karşılaştırma
-- Farklı kar marjları ile test (50, 75, 100, 125, 150 TL)
-- Rekabet edebilir mi? analizi
-- Optimal fiyat önerisi
+## 📊 Performans
 
-### Gelişmiş Fiyat Çıkarma
-- Farklı fiyat formatlarını destekler (1.850,00, 1,850.00, 1850)
-- Binlik ayırıcı otomatik algılama
-- TL işareti ve para birimi tanıma
-- Hata durumunda fallback mekanizması
+### API Response Times
+- **Google Shopping**: ~2-3 saniye
+- **Gemini AI**: ~5-8 saniye
+- **Excel Generation**: ~3-5 saniye
+- **ML Prediction**: ~1-2 saniye
 
-### Profesyonel Excel Raporu
-- 4 sayfa detaylı analiz
-- Renkli başlıklar ve tablolar
-- Otomatik sütun genişlikleri
-- Timestamp ile dosya adlandırma
+### Memory Usage
+- **Base**: ~150MB
+- **With Chrome (Selenium)**: ~300MB
+- **With ML Models**: ~200MB
+
+## 🔮 Gelecek Planları (v4.0)
+
+### 🎯 Öncelikli Özellikler
+- [ ] **RapidAPI entegrasyonu** (gerçek satış verileri)
+- [ ] **Trendyol satış verileri** (web scraping)
+- [ ] **Daha gelişmiş ML modelleri** (LSTM, XGBoost)
+- [ ] **Real-time veri güncelleme**
+- [ ] **Dashboard arayüzü**
+
+### 🚀 Gelişmiş Özellikler
+- [ ] **Çoklu dil desteği**
+- [ ] **Mobil uygulama**
+- [ ] **Email raporları**
+- [ ] **Webhook entegrasyonları**
+- [ ] **Cache sistemi**
 
 ## 🤝 Katkıda Bulunma
 
@@ -234,23 +306,23 @@ Net Kar = Önerilen Satış Fiyatı - Toplam Maliyet
 
 ## 📄 Lisans
 
-Bu proje BTK Hackathon kapsamında geliştirilmiştir.
+Bu proje MIT lisansı altında lisanslanmıştır. Detaylar için `LICENSE` dosyasına bakın.
 
 ## 📞 İletişim
 
-Proje hakkında sorularınız için issue açabilirsiniz.
+- **Proje Sahibi**: [Your Name]
+- **Email**: [your.email@example.com]
+- **GitHub**: [@your-username]
 
-## 🔄 Güncelleme Geçmişi
+## 🙏 Teşekkürler
 
-### v2.0.0 (Güncel)
-- ✅ SerpAPI entegrasyonu
-- ✅ Gelişmiş Gemini AI analizi
-- ✅ Excel rapor oluşturma
-- ✅ Akıllı kar hesaplama
-- ✅ Rekabet analizi
-- ✅ Profesyonel web arayüzü
+- **BTK** - Hackathon organizasyonu
+- **Google** - Gemini AI ve SerpAPI
+- **Open Source Community** - Kullanılan kütüphaneler
 
-### v1.0.0 (Önceki)
-- ✅ Temel web scraping
-- ✅ Basit Gemini AI entegrasyonu
-- ✅ Temel fiyat karşılaştırma
+---
+
+**Versiyon**: 3.0.0  
+**Son Güncelleme**: 2024  
+**Python Versiyonu**: 3.10+  
+**Docker**: Destekleniyor

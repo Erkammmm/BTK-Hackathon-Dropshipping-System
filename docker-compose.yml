@@ -9,6 +9,7 @@ services:
     environment:
       - GEMINI_API_KEY=${GEMINI_API_KEY}
       - SERP_API_KEY=${SERP_API_KEY}
+      - RAPIDAPI_KEY=${RAPIDAPI_KEY}
     volumes:
       # Reports klasörünü host'a bağla
       - ./reports:/app/reports

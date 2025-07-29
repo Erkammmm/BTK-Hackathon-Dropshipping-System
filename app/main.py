@@ -5,6 +5,12 @@ from app.schemas import BookRequest
 from app.gemini_agent_v2 import GeminiAgentV2
 from app.serp_agent import SerpAgent
 from app.excel_generator import ExcelGenerator
+from app.advanced_excel_generator import AdvancedExcelGenerator
+from app.trendyol_scraper import TrendyolScraper
+from app.trendyol_scraper_selenium import TrendyolScraperSelenium
+from app.rapidapi_trendyol import RapidAPITrendyol
+from app.google_trends_scraper import GoogleTrendsScraper
+from app.turkish_ecommerce_api import TurkishEcommerceAPI
 
 app = FastAPI(title="Kitap Fiyat Karşılaştırma API", version="1.0.0")
 
@@ -12,6 +18,12 @@ app = FastAPI(title="Kitap Fiyat Karşılaştırma API", version="1.0.0")
 serp_agent = SerpAgent()
 gemini_agent = GeminiAgentV2()
 excel_generator = ExcelGenerator()
+advanced_excel_generator = AdvancedExcelGenerator()
+trendyol_scraper = TrendyolScraper()
+trendyol_scraper_selenium = TrendyolScraperSelenium()
+rapidapi_trendyol = RapidAPITrendyol()
+google_trends_scraper = GoogleTrendsScraper()
+turkish_ecommerce_api = TurkishEcommerceAPI()
 
 @app.get("/", response_class=HTMLResponse)
 async def root():
@@ -53,7 +65,8 @@ async def root():
             
             <div class="search-form">
                 <input type="text" id="bookName" placeholder="Kitap adını yazın (örn: Beyaz Geceler)" />
-                <button onclick="searchBook()">🔍 Kitap Ara</button>
+                <button onclick="searchBook()">🔍 Temel Analiz</button>
+                <button onclick="searchBookAdvanced()" style="background: linear-gradient(45deg, #C5504B, #E74C3C);">🤖 Gelişmiş Analiz (ML)</button>
             </div>
             
             <div id="result" class="result">
@@ -74,12 +87,25 @@ async def root():
                     <h3>💰 En İyi Fiyat</h3>
                     <p>Tüm platformlardan en düşük fiyatlı seçeneği otomatik olarak seçer ve gösterir.</p>
                 </div>
+                <div class="feature">
+                    <h3>🤖 Machine Learning</h3>
+                    <p>Gelişmiş analiz ile aylık satış tahmini, popülerlik skoru ve 6 aylık trend analizi yapar.</p>
+                </div>
+                <div class="feature">
+                    <h3>📊 Gelişmiş Grafikler</h3>
+                    <p>Fiyat karşılaştırma, kar analizi ve satış trendi grafikleri ile görsel raporlar oluşturur.</p>
+                </div>
+                <div class="feature">
+                    <h3>📈 Excel Raporları</h3>
+                    <p>5 sayfalık detaylı Excel raporu ile profesyonel analiz sunar.</p>
+                </div>
             </div>
             
             <div class="api-info">
                 <h3>📡 API Endpoints</h3>
                 <ul>
-                    <li><strong>POST /search-book</strong> - Kitap ara ve en iyi fiyatı bul</li>
+                    <li><strong>POST /search-book</strong> - Temel kitap analizi</li>
+                    <li><strong>POST /search-book-advanced</strong> - Gelişmiş analiz (ML + Grafikler)</li>
                     <li><strong>GET /docs</strong> - API dokümantasyonu</li>
                 </ul>
             </div>
@@ -87,6 +113,14 @@ async def root():
         
         <script>
             async function searchBook() {
+                await performSearch('/search-book', 'Temel Analiz');
+            }
+            
+            async function searchBookAdvanced() {
+                await performSearch('/search-book-advanced', 'Gelişmiş Analiz (ML)');
+            }
+            
+            async function performSearch(endpoint, analysisType) {
                 const bookName = document.getElementById('bookName').value;
                 if (!bookName) {
                     alert('Lütfen kitap adını girin!');
@@ -96,11 +130,11 @@ async def root():
                 const resultDiv = document.getElementById('result');
                 const resultContent = document.getElementById('resultContent');
                 
-                resultContent.innerHTML = '<p>🔍 Arama yapılıyor...</p>';
+                resultContent.innerHTML = `<p>🔍 ${analysisType} yapılıyor...</p>`;
                 resultDiv.classList.add('show');
                 
                 try {
-                    const response = await fetch('/search-book', {
+                    const response = await fetch(endpoint, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ book_name: bookName })
@@ -225,6 +259,72 @@ async def search_book(request: BookRequest):
     except Exception as e:
         print(f"❌ Hata: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Kitap arama hatası: {str(e)}")
+
+@app.post("/search-book-advanced")
+async def search_book_advanced(request: BookRequest):
+    """Gelişmiş kitap analizi - ML tahminleri ve grafikler ile"""
+    try:
+        print(f"🔍 Gelişmiş kitap analizi: {request.book_name}")
+        
+        # SerpAPI ile Google Shopping'de arama yap
+        print("🔍 Google Shopping'de arama yapılıyor...")
+        search_results = await serp_agent.search_book(request.book_name)
+        
+        best_offer = search_results['best_offer']
+        
+        if not best_offer:
+            raise HTTPException(status_code=404, detail="Kitap bulunamadı")
+        
+        print(f"✅ En iyi teklif bulundu: {best_offer['title']} - {best_offer['price']} TL")
+        
+        # Gelişmiş Gemini analizi ve içerik üretimi
+        print("🧠 Gelişmiş analiz ve içerik üretimi yapılıyor...")
+        gemini_analysis = await gemini_agent.analyze_book_and_generate_content(
+            search_results['search_results'], 
+            best_offer
+        )
+        
+        # Türk E-ticaret API'den kitap verilerini getir (En güncel ve güvenilir)
+        print("📈 Türk E-ticaret API'den kitap verileri alınıyor...")
+        ecommerce_data = await turkish_ecommerce_api.search_book_data(best_offer['title'])
+        print(f"✅ Türk E-ticaret API verisi alındı: {ecommerce_data.get('source')}")
+        
+        # Google Trends verisi de al (ek analiz için)
+        print("📈 Google Trends'den ek veri alınıyor...")
+        trends_data = await google_trends_scraper.get_book_trends_data(best_offer['title'])
+        
+        # Birleştirilmiş veri
+        trendyol_data = {
+            'product_name': ecommerce_data['product_name'],
+            'product_url': ecommerce_data['product_url'],
+            'current_price': best_offer.get('price', 0),
+            'sales_data': ecommerce_data['sales_data'],
+            'source': ecommerce_data['source'],
+            'trend_data': trends_data['trend_data'],
+            'ecommerce_data': ecommerce_data
+        }
+        
+        # Gelişmiş Excel raporu oluştur (ML tahminleri ve grafikler ile)
+        print("📊 Gelişmiş Excel raporu oluşturuluyor...")
+        advanced_excel_file_path = advanced_excel_generator.create_advanced_book_analysis_report(
+            search_results['search_results'],
+            best_offer,
+            gemini_analysis,
+            trendyol_data
+        )
+        
+        return {
+            "success": True,
+            "search_results": search_results,
+            "best_offer": best_offer,
+            "gemini_analysis": gemini_analysis,
+            "excel_report": advanced_excel_file_path,
+            "message": f"✅ {best_offer['title']} için gelişmiş analiz, ML tahminleri ve grafikli Excel raporu tamamlandı!"
+        }
+        
+    except Exception as e:
+        print(f"❌ Hata: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Gelişmiş kitap arama hatası: {str(e)}")
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000) 
