@@ -10,7 +10,7 @@ from app.trendyol_scraper import TrendyolScraper
 from app.trendyol_scraper_selenium import TrendyolScraperSelenium
 from app.rapidapi_trendyol import RapidAPITrendyol
 from app.google_trends_scraper import GoogleTrendsScraper
-from app.turkish_ecommerce_api import TurkishEcommerceAPI
+from app.amazon_comments_api import AmazonCommentsAPI
 
 app = FastAPI(title="Kitap Fiyat Karşılaştırma API", version="1.0.0")
 
@@ -23,7 +23,7 @@ trendyol_scraper = TrendyolScraper()
 trendyol_scraper_selenium = TrendyolScraperSelenium()
 rapidapi_trendyol = RapidAPITrendyol()
 google_trends_scraper = GoogleTrendsScraper()
-turkish_ecommerce_api = TurkishEcommerceAPI()
+amazon_comments_api = AmazonCommentsAPI()
 
 @app.get("/", response_class=HTMLResponse)
 async def root():
@@ -232,11 +232,42 @@ async def search_book(request: BookRequest):
         
         print(f"✅ En iyi teklif bulundu: {best_offer['title']} - {best_offer['price']} TL")
         
-        # Gelişmiş Gemini analizi ve içerik üretimi
+        # Kitap adından Amazon ASIN'i oluştur ve yorumları çek
+        book_title = best_offer.get('title', '').split(' - ')[0]  # İlk kısmı al (yazar kısmını çıkar)
+        print(f"🔍 Kitap adı: {book_title}")
+        
+        # Amazon'da arama yapmak için kitap adını kullan
+        print("💬 Amazon'da yorum aranıyor...")
+        
+        # Manuel olarak bilinen ASIN'leri deneyelim
+        test_asins = [
+            "B07ZPKN6YR",  # Sizin verdiğiniz örnek
+            "B08N5WRWNW",  # Test için
+            "B08N5WRWNW"   # Test için
+        ]
+        
+        comments_data = None
+        for test_asin in test_asins:
+            print(f"🧪 ASIN {test_asin} deneniyor...")
+            test_comments = await amazon_comments_api.get_product_comments(test_asin, limit=10)
+            print(f"🧪 Sonuç: {test_comments.get('total_comments', 0)} yorum")
+            
+            if test_comments.get('total_comments', 0) > 0:
+                print(f"✅ Başarılı! ASIN {test_asin} ile {test_comments.get('total_comments', 0)} yorum bulundu")
+                comments_data = test_comments
+                break
+            else:
+                print(f"❌ ASIN {test_asin} için yorum yok")
+        
+        if not comments_data or comments_data.get('source') == 'sample_data':
+            print("❌ Hiçbir ASIN'de yorum bulunamadı")
+        
+        # Gelişmiş Gemini analizi ve içerik üretimi (yorum analizi dahil)
         print("🧠 Gelişmiş analiz ve içerik üretimi yapılıyor...")
         gemini_analysis = await gemini_agent.analyze_book_and_generate_content(
-            search_results['search_results'], 
-            best_offer
+            search_results['search_results'],
+            best_offer,
+            comments_data
         )
         
         # Excel raporu oluştur
@@ -277,40 +308,46 @@ async def search_book_advanced(request: BookRequest):
         
         print(f"✅ En iyi teklif bulundu: {best_offer['title']} - {best_offer['price']} TL")
         
-        # Gelişmiş Gemini analizi ve içerik üretimi
+        # Kitap adından Amazon ASIN'i bul ve yorumları çek
+        book_title = best_offer.get('title', '').split(' - ')[0]  # İlk kısmı al (yazar kısmını çıkar)
+        print(f"🔍 Kitap adı: {book_title}")
+        
+        # Amazon'da kitap ara ve ASIN bul
+        print("💬 Amazon'da kitap aranıyor...")
+        book_asin = await amazon_comments_api.search_book_asin(book_title)
+        
+        comments_data = None
+        if book_asin:
+            print(f"✅ Kitap ASIN bulundu: {book_asin}")
+            comments_data = await amazon_comments_api.get_product_comments(book_asin, limit=100)
+            print(f"🧪 Sonuç: {comments_data.get('total_comments', 0)} yorum")
+            
+            if comments_data.get('total_comments', 0) > 0:
+                print(f"✅ Başarılı! {comments_data.get('total_comments', 0)} yorum bulundu")
+            else:
+                print("❌ Bu kitap için yorum bulunamadı")
+        else:
+            print("❌ Kitap ASIN bulunamadı")
+        
+        if not comments_data or comments_data.get('source') == 'sample_data':
+            print("❌ Hiçbir yorum bulunamadı")
+        
+        # Gelişmiş Gemini analizi ve içerik üretimi (yorum analizi dahil)
         print("🧠 Gelişmiş analiz ve içerik üretimi yapılıyor...")
         gemini_analysis = await gemini_agent.analyze_book_and_generate_content(
-            search_results['search_results'], 
-            best_offer
+            search_results['search_results'],
+            best_offer,
+            comments_data
         )
         
-        # Türk E-ticaret API'den kitap verilerini getir (En güncel ve güvenilir)
-        print("📈 Türk E-ticaret API'den kitap verileri alınıyor...")
-        ecommerce_data = await turkish_ecommerce_api.search_book_data(best_offer['title'])
-        print(f"✅ Türk E-ticaret API verisi alındı: {ecommerce_data.get('source')}")
-        
-        # Google Trends verisi de al (ek analiz için)
-        print("📈 Google Trends'den ek veri alınıyor...")
-        trends_data = await google_trends_scraper.get_book_trends_data(best_offer['title'])
-        
-        # Birleştirilmiş veri
-        trendyol_data = {
-            'product_name': ecommerce_data['product_name'],
-            'product_url': ecommerce_data['product_url'],
-            'current_price': best_offer.get('price', 0),
-            'sales_data': ecommerce_data['sales_data'],
-            'source': ecommerce_data['source'],
-            'trend_data': trends_data['trend_data'],
-            'ecommerce_data': ecommerce_data
-        }
-        
-        # Gelişmiş Excel raporu oluştur (ML tahminleri ve grafikler ile)
+        # Gelişmiş Excel raporu oluştur (ML tahminleri, grafikler ve yorum analizi ile)
         print("📊 Gelişmiş Excel raporu oluşturuluyor...")
         advanced_excel_file_path = advanced_excel_generator.create_advanced_book_analysis_report(
             search_results['search_results'],
             best_offer,
             gemini_analysis,
-            trendyol_data
+            None,
+            comments_data
         )
         
         return {

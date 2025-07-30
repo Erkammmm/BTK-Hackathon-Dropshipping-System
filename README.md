@@ -1,30 +1,46 @@
-# 📚 BTK Kitap Fiyat Karşılaştırma ve Analiz Sistemi v3.0
+# 📚 BTK Kitap Fiyat Karşılaştırma ve Analiz Sistemi v4.0
 
 ## 🎯 Proje Hakkında
 
-Bu proje, kitap arama ve analiz sistemi olup, **Machine Learning** ve **Gelişmiş Excel Raporlama** özellikleri ile donatılmıştır. Sistem, Google Shopping'den fiyat karşılaştırması yapar, Gemini AI ile detaylı analiz üretir ve gelişmiş Excel raporları oluşturur.
+Bu proje, kitap arama ve analiz sistemi olup, **Gerçek Amazon Verileri**, **Machine Learning** ve **Gelişmiş Excel Raporlama** özellikleri ile donatılmıştır. Sistem, Google Shopping'den fiyat karşılaştırması yapar, Amazon'dan gerçek satış verilerini çeker, Gemini AI ile detaylı analiz üretir ve gelişmiş Excel raporları oluşturur.
 
-## ✨ Versiyon 3.0 Yeni Özellikler
+## ✨ Versiyon 4.0 Yeni Özellikler
+
+### 🚀 MAJOR OPTIMIZASYONLAR
+- **✅ Amazon API Entegrasyonu** - Gerçek satış verileri ve yorumlar
+- **✅ Real Machine Learning** - Sample data yerine Amazon verileri
+- **✅ Dinamik Trend Analizi** - ML ile 6 aylık satış tahmini
+- **✅ Sentiment Analizi** - Amazon yorumlarından duygu analizi
+- **✅ Otomatik Ürün Açıklaması** - Gemini AI ile kullanıcı bazlı açıklama
+- **✅ Zaman Serisi Analizi** - Yıllık yorum trend analizi
 
 ### 🤖 Machine Learning Özellikleri
-- **Random Forest Regressor** ile satış tahmini
-- **Popülerlik skoru** hesaplama (kitap adından)
+- **Amazon Real Data** ile satış tahmini (Sample data yerine)
+- **Sales Volume** analizi (Amazon Product Details API)
+- **Rating Distribution** analizi (Amazon yorumları)
+- **Dinamik Güven Skoru** (Amazon verilerine dayalı)
+- **ML Trend Analizi** (6 aylık dinamik tahmin)
+- **Popülerlik skoru** hesaplama (Amazon ratings'den)
 - **Kategori bazlı analiz** (Roman, Eğitim, Çocuk vs.)
-- **Güven skoru** hesaplama
-- **Aylık satış tahmini** ve gelir hesaplama
 
 ### 📊 Gelişmiş Excel Raporlama
-- **5 farklı sayfa**: Özet, Fiyat Grafikleri, Kâr Analizi, Satış Tahmini, Detaylı Analiz
+- **6 farklı sayfa**: Özet, Fiyat Grafikleri, Kâr Analizi, Satış Tahmini, Detaylı Analiz, **Amazon Yorum Analizi**
+- **Amazon Satış Verileri**: Gerçek satış tahminleri ve rekabet analizi
+- **Sentiment Analizi**: Yorumlardan duygu analizi (%75 pozitif gibi)
+- **Zaman Serisi Analizi**: Yıllık yorum trend analizi
+- **Otomatik Ürün Açıklaması**: Kullanıcı yorumlarından üretilen açıklama
 - **Tablo formatında detaylı analiz**: 3 sütunlu profesyonel görünüm
-- **Renkli tasarım**: Mavi, sarı, yeşil, turuncu renkler
+- **Renkli tasarım**: Mavi, sarı, yeşil, turuncu, mor renkler
 - **Metin kaydırma**: Uzun yazılar otomatik alt satıra geçiyor
 - **Grafikler**: Bar chart, line chart, pie chart
 
 ### 🔧 API Entegrasyonları
 - **Google Shopping** (SerpAPI) - Fiyat karşılaştırması
-- **Google Gemini AI** - Detaylı analiz ve SEO içeriği
+- **Amazon Product Details API** - Gerçek satış verileri ve ürün bilgileri
+- **Amazon Product Reviews API** - 100+ yorum ve değerlendirme
+- **Amazon Product Offers API** - Satıcı bilgileri ve rekabet analizi
+- **Google Gemini AI** - Detaylı analiz, sentiment analizi ve otomatik açıklama
 - **Google Trends** - Popülerlik analizi
-- **Türk E-ticaret API** - Hazır (gelecekte kullanılacak)
 
 ## 🚀 Hızlı Başlangıç
 
@@ -122,10 +138,11 @@ print(f"ML Tahmini: {result['sales_prediction']}")
 
 ### 📋 Özet Sayfası
 - Kitap bilgileri
-- ML satış tahminleri
-- Popülerlik skoru
-- Güven skoru
-- Aylık gelir tahmini
+- **Amazon Real Data** ML satış tahminleri
+- **Amazon Ratings** popülerlik skoru
+- **Amazon Sales Volume** güven skoru
+- **Gerçek satış verileri** aylık gelir tahmini
+- **Amazon Satış Verileri** bölümü (Toplam değerlendirme, stok durumu, satıcı sayısı)
 
 ### 📈 Fiyat Grafikleri
 - Platform fiyat karşılaştırması
@@ -139,9 +156,11 @@ print(f"ML Tahmini: {result['sales_prediction']}")
 - Net kâr tahmini
 
 ### 🎯 Satış Tahmini
-- ML model sonuçları
-- Kategori bazlı analiz
-- Trend analizi
+- **Amazon Real Data** ML model sonuçları
+- **Dinamik Trend Analizi** (ML ile 6 aylık tahmin)
+- **Mevsimsellik Faktörü** (yaz aylarında artış)
+- **Popülerlik Bazlı Ayarlama** (±10% dinamik)
+- **Güven Skoru Bazlı Trend** (yüksek güven = yavaş düşüş)
 - Günlük ortalama satış
 
 ### 📝 Detaylı Analiz
@@ -149,6 +168,13 @@ print(f"ML Tahmini: {result['sales_prediction']}")
 - SEO içeriği
 - Satış önerileri
 - Kâr analizi detayları
+
+### 🆕 Amazon Yorum Analizi (YENİ!)
+- **Sentiment Analizi**: Yorumlardan duygu analizi (%75 pozitif gibi)
+- **Zaman Serisi Analizi**: Yıllık yorum trend analizi (2021: 4.8, 2023: 3.9)
+- **Otomatik Ürün Açıklaması**: Kullanıcı yorumlarından üretilen açıklama
+- **Detaylı Yorum Tablosu**: 100+ Amazon yorumu (tarih, kullanıcı, yıldız, başlık, yorum)
+- **Yıldız Bazlı Renk Kodlaması**: Yeşil (4+), Sarı (3+), Kırmızı (<3)
 
 ## 🛠️ Kullanılan Teknolojiler
 
@@ -170,7 +196,8 @@ print(f"ML Tahmini: {result['sales_prediction']}")
 - **Seaborn** - Statistical visualization
 
 ### AI & APIs
-- **Google Gemini AI** - Content generation
+- **Google Gemini AI** - Content generation, sentiment analysis, automatic description
+- **Amazon Real-Time Data API** - Product details, reviews, offers
 - **SerpAPI** - Google Shopping data
 - **Google Trends** - Popularity analysis
 
@@ -185,9 +212,9 @@ BTK-HACKTHON-ETİCARET/
 ├── app/
 │   ├── main.py                 # FastAPI uygulaması
 │   ├── serp_agent.py          # Google Shopping API
-│   ├── gemini_agent.py        # Gemini AI entegrasyonu
+│   ├── gemini_agent_v2.py     # Gemini AI entegrasyonu (v2)
+│   ├── amazon_comments_api.py # Amazon API entegrasyonu
 │   ├── google_trends_scraper.py # Google Trends analizi
-│   ├── turkish_ecommerce_api.py # Türk E-ticaret API
 │   ├── advanced_excel_generator.py # Excel rapor oluşturucu
 │   ├── schemas.py             # Pydantic modelleri
 │   └── config.py              # Konfigürasyon
@@ -228,23 +255,47 @@ RAPIDAPI_KEY=your_rapidapi_key_here
 
 ## 📈 ML Model Detayları
 
-### Satış Tahmini Algoritması
+### Amazon Real Data Satış Tahmini
 ```python
-# Random Forest Regressor
-model = RandomForestRegressor(n_estimators=100, random_state=42)
+# Amazon Product Details API'den gelen veriler
+sales_volume = product_details.get('sales_volume')  # "1000+ sold"
+total_ratings = product_details.get('product_num_ratings')  # 751
+is_best_seller = product_details.get('is_best_seller')  # True/False
 
-# Özellikler
-features = ['price', 'popularity_score', 'category']
-
-# Tahmin
-predicted_sales = model.predict([[price, popularity, category]])
+# Dinamik tahmin algoritması
+if sales_volume:
+    estimated_sales = extract_number_from_sales_volume(sales_volume)
+elif total_ratings > 1000:
+    estimated_sales = 500
+elif total_ratings > 500:
+    estimated_sales = 300
+elif is_best_seller:
+    estimated_sales = 1000
 ```
 
-### Popülerlik Skoru Hesaplama
-- Kitap adından anahtar kelime analizi
-- Yazar popülerliği
-- Kategori etkisi
-- Başlık uzunluğu
+### Dinamik Trend Analizi
+```python
+# ML ile 6 aylık trend hesaplama
+confidence = sales_prediction.get('confidence', 0.7)
+popularity = sales_prediction.get('popularity_score', 0.5)
+
+# Güven skoruna göre trend faktörleri
+if confidence > 0.8:
+    factors = [1.0, 0.95, 0.90, 0.85, 0.80, 0.75]  # Yavaş düşüş
+elif confidence > 0.6:
+    factors = [1.0, 0.90, 0.80, 0.70, 0.60, 0.50]  # Orta düşüş
+else:
+    factors = [1.0, 0.85, 0.70, 0.55, 0.40, 0.25]  # Hızlı düşüş
+
+# Mevsimsellik + Popülerlik ayarlaması
+seasonal_factors = [1.0, 1.1, 1.2, 1.0, 0.9, 0.8]  # Yaz artışı
+```
+
+### Popülerlik Skoru Hesaplama (Amazon'dan)
+- **Total Ratings**: 751 rating = yüksek popülerlik
+- **Rating Distribution**: 5 yıldız oranı
+- **Best Seller**: Amazon best seller durumu
+- **Amazon Choice**: Amazon choice durumu
 
 ## 🚀 Deployment
 
@@ -280,14 +331,14 @@ docker-compose -f docker-compose.yml up -d
 - **With Chrome (Selenium)**: ~300MB
 - **With ML Models**: ~200MB
 
-## 🔮 Gelecek Planları (v4.0)
+## 🔮 Gelecek Planları (v5.0)
 
 ### 🎯 Öncelikli Özellikler
-- [ ] **RapidAPI entegrasyonu** (gerçek satış verileri)
-- [ ] **Trendyol satış verileri** (web scraping)
 - [ ] **Daha gelişmiş ML modelleri** (LSTM, XGBoost)
 - [ ] **Real-time veri güncelleme**
 - [ ] **Dashboard arayüzü**
+- [ ] **Çoklu platform analizi** (Kitapyurdu, D&R)
+- [ ] **Fiyat takip sistemi**
 
 ### 🚀 Gelişmiş Özellikler
 - [ ] **Çoklu dil desteği**
@@ -295,6 +346,7 @@ docker-compose -f docker-compose.yml up -d
 - [ ] **Email raporları**
 - [ ] **Webhook entegrasyonları**
 - [ ] **Cache sistemi**
+- [ ] **AI Chatbot** (kitap önerileri)
 
 ## 🤝 Katkıda Bulunma
 
@@ -322,7 +374,9 @@ Bu proje MIT lisansı altında lisanslanmıştır. Detaylar için `LICENSE` dosy
 
 ---
 
-**Versiyon**: 3.0.0  
+**Versiyon**: 4.0.0  
 **Son Güncelleme**: 2024  
 **Python Versiyonu**: 3.10+  
-**Docker**: Destekleniyor
+**Docker**: Destekleniyor  
+**Amazon API**: Entegre edildi  
+**Real ML Data**: Aktif

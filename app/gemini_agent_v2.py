@@ -11,39 +11,53 @@ class GeminiAgentV2:
         genai.configure(api_key=api_key)
         self.model = genai.GenerativeModel('gemini-1.5-flash')
     
-    async def analyze_book_and_generate_content(self, search_results: Dict, best_offer: Dict) -> Dict:
+    async def analyze_book_and_generate_content(self, search_results: Dict, best_offer: Dict, comments_data: Dict = None) -> Dict:
         """
-        Kitap analizi yap ve gelişmiş içerik üret
+        Kitap analizi yap ve gelişmiş içerik üret (Yorum analizi dahil)
         """
         try:
-            # Tüm sonuçları analiz et
+            # Temel analizler
             analysis_prompt = self.create_analysis_prompt(search_results, best_offer)
-            
-            # Gemini'den analiz al
             analysis_result = await self.call_gemini_api(analysis_prompt)
             
-            # SEO açıklaması üret
             seo_prompt = self.create_seo_prompt(best_offer)
             seo_result = await self.call_gemini_api(seo_prompt)
             
-            # Satış önerisi üret
             sales_prompt = self.create_sales_prompt(best_offer)
             sales_result = await self.call_gemini_api(sales_prompt)
             
-            # Özet oluştur
             summary_prompt = self.create_summary_prompt(best_offer)
             summary_result = await self.call_gemini_api(summary_prompt)
             
-            # Satış analizi ve kar hesaplama
             profit_analysis_prompt = self.create_profit_analysis_prompt(search_results, best_offer)
             profit_analysis_result = await self.call_gemini_api(profit_analysis_prompt)
+            
+            # Yorum analizleri (eğer yorum verisi varsa)
+            sentiment_analysis = None
+            user_based_description = None
+            trend_analysis = None
+            
+            if comments_data and comments_data.get('comments'):
+                print("🧠 Yorum analizleri yapılıyor...")
+                
+                sentiment_prompt = self.create_sentiment_analysis_prompt(comments_data)
+                sentiment_analysis = await self.call_gemini_api(sentiment_prompt)
+                
+                user_description_prompt = self.create_user_based_description_prompt(comments_data, best_offer)
+                user_based_description = await self.call_gemini_api(user_description_prompt)
+                
+                trend_prompt = self.create_trend_analysis_prompt(comments_data)
+                trend_analysis = await self.call_gemini_api(trend_prompt)
             
             return {
                 'analysis': analysis_result,
                 'seo_content': seo_result,
                 'sales_recommendation': sales_result,
                 'best_offer_summary': summary_result,
-                'profit_analysis': profit_analysis_result
+                'profit_analysis': profit_analysis_result,
+                'sentiment_analysis': sentiment_analysis,
+                'user_based_description': user_based_description,
+                'trend_analysis': trend_analysis
             }
             
         except Exception as e:
@@ -264,22 +278,185 @@ Türkçe olarak detaylı analiz yaz.
         
         return prompt
     
-    async def call_gemini_api(self, prompt: str) -> str:
-        """Gemini API'yi çağır"""
-        try:
-            print(f"🔍 Gemini API çağrılıyor...")
-            
-            response = self.model.generate_content(prompt)
-            
-            if response and response.text:
-                return response.text
+    def create_sentiment_analysis_prompt(self, comments_data: Dict) -> str:
+        """Sentiment analizi için prompt oluştur"""
+        
+        comments = comments_data.get('comments', [])
+        if not comments:
+            return "Yorum verisi bulunamadı."
+        
+        prompt = f"""
+Sen bir sentiment analizi uzmanısın. Aşağıdaki kullanıcı yorumlarını analiz et:
+
+TOPLAM YORUM SAYISI: {len(comments)}
+ORTALAMA YILDIZ: {comments_data.get('average_rating', 0)}
+
+YORUMLAR:
+"""
+        
+        for i, comment in enumerate(comments[:10], 1):  # İlk 10 yorumu al
+            prompt += f"""
+{i}. Kullanıcı: {comment.get('user', 'Anonim')}
+   Tarih: {comment.get('date', '')}
+   Yıldız: {comment.get('rating', 0)}/5
+   Başlık: {comment.get('title', '')}
+   Yorum: {comment.get('comment', '')}
+"""
+        
+        prompt += """
+
+SENTIMENT ANALİZİ YAP:
+1. Her yorumu olumlu, olumsuz veya nötr olarak etiketle
+2. Genel sentiment oranını hesapla (% olumlu, % olumsuz, % nötr)
+3. Ana temaları belirle (kalite, fiyat, hız, memnuniyet vs.)
+4. Yıldız dağılımını analiz et
+5. Güçlü ve zayıf yönleri belirle
+
+SONUÇ FORMATI:
+- Genel Sentiment: %X olumlu, %Y olumsuz, %Z nötr
+- Ana Temalar: [liste]
+- Güçlü Yönler: [liste]
+- Zayıf Yönler: [liste]
+- Genel Değerlendirme: [2-3 cümle]
+
+Türkçe olarak detaylı analiz yaz.
+"""
+        
+        return prompt
+    
+    def create_user_based_description_prompt(self, comments_data: Dict, best_offer: Dict) -> str:
+        """Kullanıcı yorumlarından ürün açıklaması üretimi"""
+        
+        comments = comments_data.get('comments', [])
+        if not comments:
+            return "Yorum verisi bulunamadı."
+        
+        # Pozitif yorumları filtrele (4-5 yıldız)
+        positive_comments = [c for c in comments if c.get('rating', 0) >= 4]
+        
+        prompt = f"""
+Sen bir pazarlama uzmanısın. Aşağıdaki kullanıcı yorumlarını kullanarak etkileyici bir ürün açıklaması yaz:
+
+KİTAP: {best_offer.get('title', '')}
+TOPLAM YORUM: {len(comments)}
+ORTALAMA YILDIZ: {comments_data.get('average_rating', 0)}
+
+POZİTİF YORUMLAR (4-5 yıldız):
+"""
+        
+        for i, comment in enumerate(positive_comments[:5], 1):
+            prompt += f"""
+{i}. "{comment.get('comment', '')}" - {comment.get('user', 'Müşteri')}
+"""
+        
+        prompt += """
+
+GÖREV:
+Bu yorumları kullanarak:
+1. Etkileyici bir ürün başlığı yaz
+2. 2-3 paragraf ürün açıklaması yaz
+3. "Müşterilerimiz ne diyor?" bölümü ekle
+4. "Neden bu kitabı almalısınız?" bölümü ekle
+5. Satış artırıcı cümleler ekle
+
+ÖZELLİKLER:
+- Gerçek kullanıcı deneyimlerini vurgula
+- Güven oluştur
+- Aciliyet hissi yarat
+- Sosyal kanıt kullan
+- Duygusal bağlantı kur
+
+Türkçe olarak profesyonel ve satış odaklı açıklama yaz.
+"""
+        
+        return prompt
+    
+    def create_trend_analysis_prompt(self, comments_data: Dict) -> str:
+        """Zaman serisi yorum analizi için prompt oluştur"""
+        
+        yearly_ratings = comments_data.get('yearly_ratings', {})
+        comments = comments_data.get('comments', [])
+        
+        if not yearly_ratings:
+            return "Yıllık veri bulunamadı."
+        
+        prompt = f"""
+Sen bir trend analizi uzmanısın. Aşağıdaki yıllık yıldız verilerini analiz et:
+
+YILLIK ORTALAMA YILDIZLAR:
+"""
+        
+        for year in sorted(yearly_ratings.keys()):
+            year_data = yearly_ratings[year]
+            if isinstance(year_data, dict):
+                avg_rating = year_data.get('average', 0)
             else:
-                print(f"❌ Gemini API boş sonuç")
-                return "API boş sonuç döndü"
-                    
-        except Exception as e:
-            print(f"❌ Gemini API çağrı hatası: {str(e)}")
-            return f"API çağrısı başarısız: {str(e)}"
+                avg_rating = year_data
+            try:
+                avg_rating = float(avg_rating)
+                prompt += f"- {year}: {avg_rating:.2f} yıldız\n"
+            except (ValueError, TypeError):
+                prompt += f"- {year}: {avg_rating} yıldız\n"
+        
+        prompt += f"""
+TOPLAM YORUM SAYISI: {len(comments)}
+GENEL ORTALAMA: {comments_data.get('average_rating', 0):.2f}
+
+TREND ANALİZİ YAP:
+1. Yıldız trendini analiz et (artış/azalış/dalgalanma)
+2. En iyi ve en kötü yılları belirle
+3. Trend değişimlerinin olası nedenlerini açıkla
+4. Gelecek trend tahmini yap
+5. Kalite değişimi var mı değerlendir
+
+SONUÇ FORMATI:
+- Trend Yönü: [Artış/Azalış/Dalgalanma]
+- En İyi Yıl: [Yıl] - [Yıldız]
+- En Kötü Yıl: [Yıl] - [Yıldız]
+- Trend Değişimi: [Açıklama]
+- Kalite Değerlendirmesi: [Açıklama]
+- Gelecek Tahmini: [Açıklama]
+
+Türkçe olarak detaylı trend analizi yaz.
+"""
+        
+        return prompt
+    
+    async def call_gemini_api(self, prompt: str) -> str:
+        """Gemini API'yi çağır (retry ve fallback ile)"""
+        max_retries = 3
+        retry_delay = 2
+        
+        for attempt in range(max_retries):
+            try:
+                print(f"🔍 Gemini API çağrılıyor... (Deneme {attempt + 1}/{max_retries})")
+                
+                response = self.model.generate_content(prompt)
+                
+                if response and response.text:
+                    return response.text
+                else:
+                    print(f"❌ Gemini API boş sonuç")
+                    return "API boş sonuç döndü"
+                        
+            except Exception as e:
+                error_msg = str(e)
+                print(f"❌ Gemini API çağrı hatası (Deneme {attempt + 1}): {error_msg}")
+                
+                # Rate limit veya overload hatası ise bekle
+                if "429" in error_msg or "503" in error_msg or "overloaded" in error_msg.lower():
+                    if attempt < max_retries - 1:  # Son deneme değilse bekle
+                        print(f"⏳ {retry_delay} saniye bekleniyor...")
+                        import asyncio
+                        await asyncio.sleep(retry_delay)
+                        retry_delay *= 2  # Exponential backoff
+                        continue
+                
+                # Diğer hatalar için fallback döndür
+                return f"API çağrısı başarısız: {error_msg}"
+        
+        # Tüm denemeler başarısız
+        return "Gemini API tüm denemelerde başarısız oldu"
     
     def get_fallback_content(self, best_offer: Dict) -> Dict:
         """Fallback içerik"""
@@ -297,5 +474,8 @@ Türkçe olarak detaylı analiz yaz.
             'seo_content': f"SEO içeriği: {best_offer.get('title', '')} - {best_offer.get('price', 0)} TL fiyatla {best_offer.get('platform', '')} platformunda satışta. Kitap severler için ideal fiyat ve kalite.",
             'sales_recommendation': f"Satış önerisi: {best_offer.get('platform', '')} platformunda {best_offer.get('price', 0)} TL fiyatla satabilirsiniz. Hedef kitle kitap severler ve öğrenciler.",
             'best_offer_summary': f"{best_offer.get('title', '')} kitabı {best_offer.get('platform', '')} platformunda {best_offer.get('price', 0)} TL fiyatla bulunabilir. Bu fiyatla satış yapabilirsiniz.",
-            'profit_analysis': f"Kar Analizi: {best_offer.get('title', '')} kitabı {best_price} TL'ye alınıp {suggested_selling_price:.2f} TL'ye satılabilir. %21 komisyon, 70 TL kargo ve 100 TL kar ile toplam {suggested_selling_price - total_cost:.2f} TL net kar elde edilir."
+            'profit_analysis': f"Kar Analizi: {best_offer.get('title', '')} kitabı {best_price} TL'ye alınıp {suggested_selling_price:.2f} TL'ye satılabilir. %21 komisyon, 70 TL kargo ve 100 TL kar ile toplam {suggested_selling_price - total_cost:.2f} TL net kar elde edilir.",
+            'sentiment_analysis': "Gemini API limiti aşıldığı için sentiment analizi yapılamadı. Lütfen daha sonra tekrar deneyin.",
+            'user_based_description': "Gemini API limiti aşıldığı için kullanıcı bazlı ürün açıklaması üretilemedi. Lütfen daha sonra tekrar deneyin.",
+            'trend_analysis': "Gemini API limiti aşıldığı için trend analizi yapılamadı. Lütfen daha sonra tekrar deneyin."
         } 

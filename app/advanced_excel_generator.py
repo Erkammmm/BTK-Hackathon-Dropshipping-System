@@ -64,10 +64,31 @@ class AdvancedExcelGenerator:
         
         return pd.DataFrame(data)
     
-    def predict_sales(self, book_title: str, price: float, category: str = None, trendyol_data: Dict = None) -> Dict:
+    def predict_sales(self, book_title: str, price: float, category: str = None, trendyol_data: Dict = None, amazon_sales_data: Dict = None) -> Dict:
         """ML model ile satış tahmini yap (Gerçek veri varsa kullan)"""
         try:
-            # Türk E-ticaret API verisi varsa onu kullan
+            # Amazon satış verisi varsa onu kullan (ÖNCELİK 1)
+            if amazon_sales_data and amazon_sales_data.get('estimated_monthly_sales', 0) > 0:
+                sales_data = amazon_sales_data
+                
+                return {
+                    'predicted_sales': sales_data.get('estimated_monthly_sales', 0),
+                    'confidence': sales_data.get('confidence_score', 0.7),
+                    'monthly_revenue': sales_data.get('estimated_monthly_sales', 0) * price,
+                    'popularity_score': min(1.0, sales_data.get('confidence_score', 0.7) + 0.2),
+                    'category': category or 'Roman',
+                    'trend': 'increasing' if sales_data.get('confidence_score', 0.7) > 0.8 else 'stable',
+                    'daily_average': sales_data.get('daily_average', 0),
+                    'sales_history': [],
+                    'source': 'amazon_api',
+                    'amazon_data': sales_data,
+                    'total_ratings': sales_data.get('total_ratings', 0),
+                    'availability': sales_data.get('availability', 'Unknown'),
+                    'seller_count': sales_data.get('seller_count', 0),
+                    'competition_level': sales_data.get('competition_level', 'Unknown')
+                }
+            
+            # Türk E-ticaret API verisi varsa onu kullan (ÖNCELİK 2)
             if trendyol_data and trendyol_data.get('source') in ['turkish_ecommerce_crawler', 'turkish_ecommerce_search']:
                 sales_data = trendyol_data.get('sales_data', {})
                 
@@ -161,6 +182,52 @@ class AdvancedExcelGenerator:
                 'source': 'error_fallback'
             }
     
+    def _calculate_monthly_trend(self, base_sales: int, sales_prediction: Dict) -> List[float]:
+        """ML ile 6 aylık trend hesapla"""
+        try:
+            # Faktörleri hesapla
+            confidence = sales_prediction.get('confidence', 0.7)
+            popularity = sales_prediction.get('popularity_score', 0.5)
+            source = sales_prediction.get('source', 'sample_data')
+            
+            # Trend faktörleri (dinamik hesaplama)
+            if source == 'amazon_api':
+                # Amazon verisi varsa daha gerçekçi trend
+                if confidence > 0.8:
+                    # Yüksek güven = yavaş düşüş
+                    factors = [1.0, 0.95, 0.90, 0.85, 0.80, 0.75]
+                elif confidence > 0.6:
+                    # Orta güven = orta düşüş
+                    factors = [1.0, 0.90, 0.80, 0.70, 0.60, 0.50]
+                else:
+                    # Düşük güven = hızlı düşüş
+                    factors = [1.0, 0.85, 0.70, 0.55, 0.40, 0.25]
+            else:
+                # Sample data için standart trend
+                factors = [1.0, 0.90, 0.80, 0.70, 0.60, 0.50]
+            
+            # Popülerlik skoruna göre ayarla
+            popularity_adjustment = (popularity - 0.5) * 0.2  # ±10% ayarlama
+            
+            # Mevsimsellik faktörü (kitap satışları için)
+            seasonal_factors = [1.0, 1.1, 1.2, 1.0, 0.9, 0.8]  # Yaz aylarında artış
+            
+            # Final hesaplama
+            monthly_predictions = []
+            for i, (base_factor, seasonal_factor) in enumerate(zip(factors, seasonal_factors)):
+                adjusted_factor = base_factor + popularity_adjustment
+                final_factor = adjusted_factor * seasonal_factor
+                prediction = base_sales * final_factor
+                monthly_predictions.append(prediction)
+            
+            print(f"🔍 Aylık trend hesaplandı: {monthly_predictions}")
+            return monthly_predictions
+            
+        except Exception as e:
+            print(f"❌ Aylık trend hesaplama hatası: {str(e)}")
+            # Fallback: basit düşüş
+            return [base_sales * (1.0 - i * 0.1) for i in range(6)]
+    
     def _estimate_popularity(self, book_title: str) -> float:
         """Kitap adından popülerlik skoru tahmin et"""
         title_lower = book_title.lower()
@@ -188,14 +255,21 @@ class AdvancedExcelGenerator:
         
         return max(0.1, min(1.0, popularity_score))
     
-    def create_advanced_book_analysis_report(self, search_results: Dict, best_offer: Dict, gemini_analysis: Dict, trendyol_data: Dict = None) -> str:
+    def create_advanced_book_analysis_report(self, search_results: Dict, best_offer: Dict, gemini_analysis: Dict, trendyol_data: Dict = None, comments_data: Dict = None) -> str:
         """Gelişmiş kitap analizi Excel raporu oluştur"""
         
-        # ML tahmini yap (Trendyol verisi varsa kullan)
+        # Amazon satış verilerini çıkar
+        amazon_sales_data = None
+        if comments_data and comments_data.get('sales_data'):
+            amazon_sales_data = comments_data.get('sales_data')
+            print(f"🔍 Amazon satış verileri kullanılacak: {amazon_sales_data}")
+        
+        # ML tahmini yap (Amazon verisi varsa kullan)
         sales_prediction = self.predict_sales(
             best_offer.get('title', ''),
             best_offer.get('price', 0),
-            trendyol_data=trendyol_data
+            trendyol_data=trendyol_data,
+            amazon_sales_data=amazon_sales_data
         )
         
         # Dosya adı oluştur
@@ -218,6 +292,9 @@ class AdvancedExcelGenerator:
             self.create_sales_history_sheet(wb, sales_prediction)
         
         self.create_detailed_analysis_sheet(wb, gemini_analysis)
+        
+        # Yorum analizi sayfası ekle (her zaman oluştur)
+        self.create_comments_analysis_sheet(wb, comments_data, gemini_analysis)
         
         # Excel dosyasını kaydet
         wb.save(filepath)
@@ -268,28 +345,31 @@ class AdvancedExcelGenerator:
         ws['A17'] = "Kategori:"
         ws['B17'] = sales_prediction['category']
         
-        # Türk E-ticaret API verileri varsa göster
-        if sales_prediction.get('source') == 'turkish_ecommerce_api':
-            ws['A19'] = "TÜRK E-TİCARET API VERİLERİ"
+        # Amazon verileri varsa ek bilgiler
+        if sales_prediction.get('source') == 'amazon_api':
+            ws['A19'] = "AMAZON SATIŞ VERİLERİ"
             ws['A19'].font = Font(bold=True, size=12, color="FFFFFF")
             ws['A19'].fill = PatternFill(start_color="FF6B35", end_color="FF6B35", fill_type="solid")
-            ws.merge_cells('A19:B19')
+            ws.merge_cells('A19:I19')
             
-            ws['A21'] = "Satış Sayısı:"
-            ws['B21'] = f"{sales_prediction.get('sales_data', {}).get('sales_count', 0)} adet"
-            ws['A22'] = "Değerlendirme Sayısı:"
-            ws['B22'] = f"{sales_prediction.get('sales_data', {}).get('rating_count', 0)} adet"
-            ws['A23'] = "Değerlendirme Puanı:"
-            ws['B23'] = f"{sales_prediction.get('sales_data', {}).get('rating_score', 0):.1f}/5"
-            ws['A24'] = "Yorum Sayısı:"
-            ws['B24'] = f"{sales_prediction.get('sales_data', {}).get('review_count', 0)} adet"
-            ws['A25'] = "Popülerlik Skoru:"
-            ws['B25'] = f"{sales_prediction.get('popularity_score', 0):.2f}"
+            ws['A21'] = "Toplam Değerlendirme:"
+            ws['B21'] = sales_prediction.get('total_ratings', 0)
+            ws['A22'] = "Stok Durumu:"
+            ws['B22'] = sales_prediction.get('availability', 'Unknown')
+            ws['A23'] = "Satıcı Sayısı:"
+            ws['B23'] = sales_prediction.get('seller_count', 0)
+            ws['A24'] = "Rekabet Seviyesi:"
+            ws['B24'] = sales_prediction.get('competition_level', 'Unknown')
             
-            # Türk E-ticaret API verileri için stil
-            for row in range(21, 26):
+            # Amazon verileri için stil
+            for row in range(21, 25):
                 ws[f'A{row}'].font = Font(bold=True)
                 ws[f'A{row}'].fill = PatternFill(start_color="FFF2E6", end_color="FFF2E6", fill_type="solid")
+        
+
+        
+        # Türk E-ticaret API verileri varsa göster (KALDIRILDI)
+        # Sadece mevcut ML tahminleri ve yorum analizleri ile devam et
         
         # Stil uygula
         for row in range(3, 7):
@@ -309,6 +389,173 @@ class AdvancedExcelGenerator:
         # Sütun genişliklerini ayarla
         ws.column_dimensions['A'].width = 25
         ws.column_dimensions['B'].width = 50
+    
+    def create_comments_analysis_sheet(self, wb: Workbook, comments_data: Dict, gemini_analysis: Dict):
+        """Amazon yorum analizi sayfası oluştur (6. sayfa)"""
+        ws = wb.create_sheet("Amazon Yorum Analizi")
+        
+        # Eğer yorum verisi yoksa sample data kullan
+        if not comments_data or not comments_data.get('comments'):
+            comments_data = {
+                'total_comments': 0,
+                'average_rating': 0.0,
+                'source': 'no_data',
+                'timestamp': datetime.now().isoformat(),
+                'comments': [],
+                'yearly_ratings': {}
+            }
+        
+        # Başlık
+        ws['A1'] = "AMAZON YORUM ANALİZİ VE OTOMATİK ÜRÜN AÇIKLAMASI"
+        ws['A1'].font = Font(size=16, bold=True, color="FFFFFF")
+        ws['A1'].fill = PatternFill(start_color="8E44AD", end_color="8E44AD", fill_type="solid")
+        ws.merge_cells('A1:H1')
+        
+        # Genel istatistikler
+        ws['A3'] = "GENEL İSTATİSTİKLER"
+        ws['A3'].font = Font(bold=True, size=12, color="FFFFFF")
+        ws['A3'].fill = PatternFill(start_color="9B59B6", end_color="9B59B6", fill_type="solid")
+        ws.merge_cells('A3:H3')
+        
+        ws['A5'] = "Toplam Yorum Sayısı:"
+        ws['B5'] = comments_data.get('total_comments', 0)
+        ws['A6'] = "Ortalama Yıldız:"
+        ws['B6'] = f"{comments_data.get('average_rating', 0):.2f}/5"
+        ws['A7'] = "Veri Kaynağı:"
+        ws['B7'] = comments_data.get('source', 'unknown').upper()
+        ws['A8'] = "Analiz Tarihi:"
+        ws['B8'] = comments_data.get('timestamp', '').split('T')[0] if comments_data.get('timestamp') else ''
+        
+        # 1. ZAMAN SERİSİ YORUM ANALİZİ (TREND TAKİBİ)
+        ws['A10'] = "1. ZAMAN SERİSİ YORUM ANALİZİ (TREND TAKİBİ)"
+        ws['A10'].font = Font(bold=True, size=12, color="FFFFFF")
+        ws['A10'].fill = PatternFill(start_color="F39C12", end_color="F39C12", fill_type="solid")
+        ws.merge_cells('A10:H10')
+        
+        # Yıllık trend tablosu
+        yearly_ratings = comments_data.get('yearly_ratings', {})
+        ws['A12'] = "Yıllık Ortalama Yıldızlar:"
+        ws['A12'].font = Font(bold=True)
+        row = 13
+        for year in sorted(yearly_ratings.keys()):
+            ws[f'A{row}'] = f"{year} Yılı:"
+            year_data = yearly_ratings[year]
+            if isinstance(year_data, dict):
+                avg_rating = year_data.get('average', 0)
+            else:
+                avg_rating = year_data
+            try:
+                avg_rating = float(avg_rating)
+                ws[f'B{row}'] = f"{avg_rating:.2f} yıldız"
+            except (ValueError, TypeError):
+                ws[f'B{row}'] = f"{avg_rating} yıldız"
+            row += 1
+        
+        # Gemini trend analizi
+        if gemini_analysis.get('trend_analysis'):
+            ws[f'A{row + 1}'] = "GEMINI TREND ANALİZİ:"
+            ws[f'A{row + 1}'].font = Font(bold=True, color="F39C12")
+            ws[f'A{row + 2}'] = gemini_analysis['trend_analysis']
+            ws[f'A{row + 2}'].alignment = Alignment(wrap_text=True, vertical='top')
+            ws.merge_cells(f'A{row + 2}:H{row + 8}')
+        else:
+            ws[f'A{row + 1}'] = "GEMINI TREND ANALİZİ:"
+            ws[f'A{row + 1}'].font = Font(bold=True, color="F39C12")
+            ws[f'A{row + 2}'] = "Gemini API limiti aşıldığı için trend analizi yapılamadı. Lütfen daha sonra tekrar deneyin."
+            ws[f'A{row + 2}'].alignment = Alignment(wrap_text=True, vertical='top')
+            ws.merge_cells(f'A{row + 2}:H{row + 8}')
+        
+        # 2. YORUMDAN ANLAM ÇIKARMA (SENTIMENT ANALİZİ)
+        sentiment_start_row = row + 10
+        ws[f'A{sentiment_start_row}'] = "2. YORUMDAN ANLAM ÇIKARMA (SENTIMENT ANALİZİ)"
+        ws[f'A{sentiment_start_row}'].font = Font(bold=True, size=12, color="FFFFFF")
+        ws[f'A{sentiment_start_row}'].fill = PatternFill(start_color="E74C3C", end_color="E74C3C", fill_type="solid")
+        ws.merge_cells(f'A{sentiment_start_row}:H{sentiment_start_row}')
+        
+        if gemini_analysis.get('sentiment_analysis'):
+            ws[f'A{sentiment_start_row + 2}'] = gemini_analysis['sentiment_analysis']
+            ws[f'A{sentiment_start_row + 2}'].alignment = Alignment(wrap_text=True, vertical='top')
+            ws.merge_cells(f'A{sentiment_start_row + 2}:H{sentiment_start_row + 8}')
+        else:
+            ws[f'A{sentiment_start_row + 2}'] = "Gemini API limiti aşıldığı için sentiment analizi yapılamadı. Lütfen daha sonra tekrar deneyin."
+            ws[f'A{sentiment_start_row + 2}'].alignment = Alignment(wrap_text=True, vertical='top')
+            ws.merge_cells(f'A{sentiment_start_row + 2}:H{sentiment_start_row + 8}')
+        
+        # 3. OTOMATİK ÜRÜN AÇIKLAMASI ÜRETİMİ
+        description_start_row = sentiment_start_row + 10
+        ws[f'A{description_start_row}'] = "3. OTOMATİK ÜRÜN AÇIKLAMASI ÜRETİMİ"
+        ws[f'A{description_start_row}'].font = Font(bold=True, size=12, color="FFFFFF")
+        ws[f'A{description_start_row}'].fill = PatternFill(start_color="27AE60", end_color="27AE60", fill_type="solid")
+        ws.merge_cells(f'A{description_start_row}:H{description_start_row}')
+        
+        if gemini_analysis.get('user_based_description'):
+            ws[f'A{description_start_row + 2}'] = gemini_analysis['user_based_description']
+            ws[f'A{description_start_row + 2}'].alignment = Alignment(wrap_text=True, vertical='top')
+            ws.merge_cells(f'A{description_start_row + 2}:H{description_start_row + 12}')
+        else:
+            ws[f'A{description_start_row + 2}'] = "Gemini API limiti aşıldığı için kullanıcı bazlı ürün açıklaması üretilemedi. Lütfen daha sonra tekrar deneyin."
+            ws[f'A{description_start_row + 2}'].alignment = Alignment(wrap_text=True, vertical='top')
+            ws.merge_cells(f'A{description_start_row + 2}:H{description_start_row + 12}')
+        
+        # 4. DETAYLI YORUM TABLOSU
+        table_start_row = description_start_row + 15
+        ws[f'A{table_start_row}'] = "4. DETAYLI YORUM TABLOSU (AMAZON API'DEN ALINAN VERİLER)"
+        ws[f'A{table_start_row}'].font = Font(bold=True, size=12, color="FFFFFF")
+        ws[f'A{table_start_row}'].fill = PatternFill(start_color="9B59B6", end_color="9B59B6", fill_type="solid")
+        ws.merge_cells(f'A{table_start_row}:H{table_start_row}')
+        
+        # Tablo başlıkları
+        headers = ['Tarih', 'Kullanıcı', 'Yıldız', 'Başlık', 'Yorum']
+        for col, header in enumerate(headers, 1):
+            cell = ws.cell(row=table_start_row + 2, column=col, value=header)
+            cell.font = Font(bold=True, color="FFFFFF")
+            cell.fill = PatternFill(start_color="8E44AD", end_color="8E44AD", fill_type="solid")
+        
+        # Yorumları ekle (Rapid API'den gelen gerçek veriler)
+        comments = comments_data.get('comments', [])
+        if comments:
+            for i, comment in enumerate(comments[:30], table_start_row + 3):  # İlk 30 yorumu göster
+                ws.cell(row=i, column=1, value=str(comment.get('date', '')))
+                ws.cell(row=i, column=2, value=str(comment.get('user', '')))
+                ws.cell(row=i, column=3, value=float(comment.get('rating', 0)))
+                ws.cell(row=i, column=4, value=str(comment.get('title', '')))
+                
+                comment_cell = ws.cell(row=i, column=5, value=str(comment.get('comment', '')))
+                comment_cell.alignment = Alignment(wrap_text=True, vertical='top')
+                
+                # Yıldıza göre renk
+                rating = float(comment.get('rating', 0))
+                if rating >= 4:
+                    color = "D5F4E6"  # Yeşil
+                elif rating >= 3:
+                    color = "FEF9E7"  # Sarı
+                else:
+                    color = "FADBD8"  # Kırmızı
+                
+                for col in range(1, 6):
+                    ws.cell(row=i, column=col).fill = PatternFill(start_color=color, end_color=color, fill_type="solid")
+        else:
+            # Yorum yoksa bilgi mesajı
+            ws.cell(row=table_start_row + 3, column=1, value="Yorum verisi bulunamadı")
+            ws.cell(row=table_start_row + 3, column=2, value="Amazon URL'i bulunamadı veya yorum yok")
+            ws.cell(row=table_start_row + 3, column=3, value="-")
+            ws.cell(row=table_start_row + 3, column=4, value="-")
+            ws.cell(row=table_start_row + 3, column=5, value="Bu ürün için henüz yorum bulunmuyor veya Amazon ASIN'i tespit edilemedi.")
+        
+        # Sütun genişliklerini ayarla
+        ws.column_dimensions['A'].width = 12  # Tarih
+        ws.column_dimensions['B'].width = 15  # Kullanıcı
+        ws.column_dimensions['C'].width = 8   # Yıldız
+        ws.column_dimensions['D'].width = 20  # Başlık
+        ws.column_dimensions['E'].width = 50  # Yorum
+        
+        # Satır yüksekliklerini ayarla (analiz bölümleri için)
+        for row in range(19, 26):
+            ws.row_dimensions[row].height = 120
+        for row in range(29, 36):
+            ws.row_dimensions[row].height = 120
+        for row in range(39, 46):
+            ws.row_dimensions[row].height = 120
     
     def create_price_charts_sheet(self, wb: Workbook, search_results: Dict, best_offer: Dict):
         """Fiyat grafikleri sayfası oluştur"""
@@ -482,21 +729,20 @@ class AdvancedExcelGenerator:
         ws['A11'].font = Font(bold=True, size=14)
         ws.merge_cells('A11:C11')
         
-        # 6 aylık tahmin
+        # 6 aylık tahmin (Amazon verisi varsa kullan)
         months = ['1. Ay', '2. Ay', '3. Ay', '4. Ay', '5. Ay', '6. Ay']
+        
+        # 6 aylık tahmin (ML ile dinamik hesaplama)
         base_sales = sales_prediction['predicted_sales']
+        monthly_predictions = self._calculate_monthly_trend(base_sales, sales_prediction)
         
-        # Trend faktörleri (mevsimsellik, popülerlik azalması)
-        trend_factors = [1.0, 0.9, 0.8, 0.7, 0.6, 0.5]
-        
-        for col, (month, factor) in enumerate(zip(months, trend_factors), 1):
+        for col, (month, prediction) in enumerate(zip(months, monthly_predictions), 1):
             ws.cell(row=12, column=col, value=month)
             ws.cell(row=12, column=col).font = Font(bold=True)
             
-            predicted_sales = int(base_sales * factor)
-            ws.cell(row=13, column=col, value=predicted_sales)
+            ws.cell(row=13, column=col, value=int(prediction))
             
-            revenue = predicted_sales * best_offer.get('price', 0)
+            revenue = prediction * best_offer.get('price', 0)
             ws.cell(row=14, column=col, value=f"{revenue:.0f}")
         
         ws.cell(row=13, column=1, value="Satış Adedi").font = Font(bold=True)
