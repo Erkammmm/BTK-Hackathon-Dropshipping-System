@@ -1,8 +1,8 @@
-# 📚 BTK Kitap Fiyat Karşılaştırma ve Analiz Sistemi v5.0
+# 📚 Yerel Dropshipping Uygulaması: PazarDrop v5.0
 
 ## 🎯 Proje Hakkında
 
-Bu proje, kitap arama ve analiz sistemi olup, **Gerçek Veriler**, **Machine Learning** ve **Gelişmiş Excel Raporlama** özellikleri ile donatılmıştır. Sistem, Google Shopping'den fiyat karşılaştırması yapar, Amazon'dan gerçek satış verilerini çeker, Gemini AI ile detaylı analiz üretir ve gelişmiş Excel raporları oluşturur.
+**PazarDrop**, yerel dropshipping için geliştirilmiş akıllı kitap analiz ve karşılaştırma platformudur. **Gerçek Veriler**, **Machine Learning** ve **Gelişmiş Excel Raporlama** özellikleri ile donatılmıştır. Sistem, Google Shopping'den fiyat karşılaştırması yapar, Amazon'dan gerçek satış verilerini çeker, Gemini AI ile detaylı analiz üretir ve dropshipping kararları için gelişmiş Excel raporları oluşturur.
 
 ## ✨ Versiyon 5.0 Yeni Özellikler
 
