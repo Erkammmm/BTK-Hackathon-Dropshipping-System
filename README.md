@@ -1,21 +1,22 @@
-# 📚 BTK Kitap Fiyat Karşılaştırma ve Analiz Sistemi v4.0
+# 📚 BTK Kitap Fiyat Karşılaştırma ve Analiz Sistemi v5.0
 
 ## 🎯 Proje Hakkında
 
-Bu proje, kitap arama ve analiz sistemi olup, **Gerçek Amazon Verileri**, **Machine Learning** ve **Gelişmiş Excel Raporlama** özellikleri ile donatılmıştır. Sistem, Google Shopping'den fiyat karşılaştırması yapar, Amazon'dan gerçek satış verilerini çeker, Gemini AI ile detaylı analiz üretir ve gelişmiş Excel raporları oluşturur.
+Bu proje, kitap arama ve analiz sistemi olup, **Gerçek Veriler**, **Machine Learning** ve **Gelişmiş Excel Raporlama** özellikleri ile donatılmıştır. Sistem, Google Shopping'den fiyat karşılaştırması yapar, Amazon'dan gerçek satış verilerini çeker, Gemini AI ile detaylı analiz üretir ve gelişmiş Excel raporları oluşturur.
 
-## ✨ Versiyon 4.0 Yeni Özellikler
+## ✨ Versiyon 5.0 Yeni Özellikler
 
 ### 🚀 MAJOR OPTIMIZASYONLAR
 - **✅ Amazon API Entegrasyonu** - Gerçek satış verileri ve yorumlar
-- **✅ Real Machine Learning** - Sample data yerine Amazon verileri
+- **✅ Real Machine Learning** - Gerçek veriler
 - **✅ Dinamik Trend Analizi** - ML ile 6 aylık satış tahmini
 - **✅ Sentiment Analizi** - Amazon yorumlarından duygu analizi
 - **✅ Otomatik Ürün Açıklaması** - Gemini AI ile kullanıcı bazlı açıklama
 - **✅ Zaman Serisi Analizi** - Yıllık yorum trend analizi
+- **🆕 Dropshipping Analizi** - Yerel dropshipping potansiyeli analizi
 
 ### 🤖 Machine Learning Özellikleri
-- **Amazon Real Data** ile satış tahmini (Sample data yerine)
+- **Amazon Real Data** ile satış tahmini (Gerçek veriler)
 - **Sales Volume** analizi (Amazon Product Details API)
 - **Rating Distribution** analizi (Amazon yorumları)
 - **Dinamik Güven Skoru** (Amazon verilerine dayalı)
@@ -24,11 +25,12 @@ Bu proje, kitap arama ve analiz sistemi olup, **Gerçek Amazon Verileri**, **Mac
 - **Kategori bazlı analiz** (Roman, Eğitim, Çocuk vs.)
 
 ### 📊 Gelişmiş Excel Raporlama
-- **6 farklı sayfa**: Özet, Fiyat Grafikleri, Kâr Analizi, Satış Tahmini, Detaylı Analiz, **Amazon Yorum Analizi**
+- **7 farklı sayfa**: Özet, Fiyat Grafikleri, Kâr Analizi, Satış Tahmini, Detaylı Analiz, Amazon Yorum Analizi, **Sonuç**
 - **Amazon Satış Verileri**: Gerçek satış tahminleri ve rekabet analizi
 - **Sentiment Analizi**: Yorumlardan duygu analizi (%75 pozitif gibi)
 - **Zaman Serisi Analizi**: Yıllık yorum trend analizi
 - **Otomatik Ürün Açıklaması**: Kullanıcı yorumlarından üretilen açıklama
+- **Dropshipping Analizi**: Yerel dropshipping potansiyeli ve kar analizi
 - **Tablo formatında detaylı analiz**: 3 sütunlu profesyonel görünüm
 - **Renkli tasarım**: Mavi, sarı, yeşil, turuncu, mor renkler
 - **Metin kaydırma**: Uzun yazılar otomatik alt satıra geçiyor
@@ -36,10 +38,8 @@ Bu proje, kitap arama ve analiz sistemi olup, **Gerçek Amazon Verileri**, **Mac
 
 ### 🔧 API Entegrasyonları
 - **Google Shopping** (SerpAPI) - Fiyat karşılaştırması
-- **Amazon Product Details API** - Gerçek satış verileri ve ürün bilgileri
-- **Amazon Product Reviews API** - 100+ yorum ve değerlendirme
-- **Amazon Product Offers API** - Satıcı bilgileri ve rekabet analizi
-- **Google Gemini AI** - Detaylı analiz, sentiment analizi ve otomatik açıklama
+- **Amazon Real-Time Data API** (RapidAPI) - Gerçek satış verileri, ürün bilgileri, yorumlar ve satıcı bilgileri
+- **Google Gemini AI** - Detaylı analiz, sentiment analizi, otomatik açıklama ve dropshipping analizi
 - **Google Trends** - Popülerlik analizi
 
 ## 🚀 Hızlı Başlangıç
@@ -151,8 +151,7 @@ print(f"ML Tahmini: {result['sales_prediction']}")
 
 ### 💰 Kâr Analizi
 - Kâr marjı hesaplamaları
-- Trendyol komisyon analizi
-- Kargo maliyeti hesaplama
+- %14 komisyon analizi
 - Net kâr tahmini
 
 ### 🎯 Satış Tahmini
@@ -169,12 +168,22 @@ print(f"ML Tahmini: {result['sales_prediction']}")
 - Satış önerileri
 - Kâr analizi detayları
 
-### 🆕 Amazon Yorum Analizi (YENİ!)
+### 🆕 Amazon Yorum Analizi
 - **Sentiment Analizi**: Yorumlardan duygu analizi (%75 pozitif gibi)
 - **Zaman Serisi Analizi**: Yıllık yorum trend analizi (2021: 4.8, 2023: 3.9)
 - **Otomatik Ürün Açıklaması**: Kullanıcı yorumlarından üretilen açıklama
 - **Detaylı Yorum Tablosu**: 100+ Amazon yorumu (tarih, kullanıcı, yıldız, başlık, yorum)
 - **Yıldız Bazlı Renk Kodlaması**: Yeşil (4+), Sarı (3+), Kırmızı (<3)
+
+### 🆕 Sonuç Sayfası (Dropshipping Analizi)
+- **Fiyat Analizi**: En ucuz ve en pahalı fiyat karşılaştırması
+- **Dropshipping Hesaplaması**: %14 komisyon + 100 TL kar marjı ile önerilen satış fiyatı
+- **Kar Analizi**: Gemini AI ile detaylı kar potansiyeli analizi
+- **Trendyol Satış Önerisi**: Fiyat uygunluğuna göre satış önerisi veya risk uyarısı
+- **Detaylı Fiyat Tablosu**: Platform bazlı dropshipping potansiyeli
+- **Gemini AI Analizi**: Yerel dropshipping stratejisi ve öneriler
+
+## Tüm analizde Gemine API kullanılmıştır.
 
 ## 🛠️ Kullanılan Teknolojiler
 
@@ -196,14 +205,11 @@ print(f"ML Tahmini: {result['sales_prediction']}")
 - **Seaborn** - Statistical visualization
 
 ### AI & APIs
-- **Google Gemini AI** - Content generation, sentiment analysis, automatic description
+- **Google Gemini AI** - Content generation, sentiment analysis, automatic description, dropshipping analysis
 - **Amazon Real-Time Data API** - Product details, reviews, offers
 - **SerpAPI** - Google Shopping data
 - **Google Trends** - Popularity analysis
 
-### Web Scraping
-- **BeautifulSoup4** - HTML parsing
-- **Selenium** - Browser automation
 
 ## 📁 Proje Yapısı
 
@@ -250,7 +256,7 @@ RAPIDAPI_KEY=your_rapidapi_key_here
 
 #### 🔑 RapidAPI
 1. [RapidAPI](https://rapidapi.com/) adresine gidin
-2. Türk E-ticaret API'sine abone olun
+2. Amazon Data API'sine abone olun
 3. API key alın
 
 ## 📈 ML Model Detayları
@@ -318,65 +324,38 @@ docker run -d \
 docker-compose -f docker-compose.yml up -d
 ```
 
-## 📊 Performans
+## 💡 Yerel Dropshipping Kavramı
 
-### API Response Times
-- **Google Shopping**: ~2-3 saniye
-- **Gemini AI**: ~5-8 saniye
-- **Excel Generation**: ~3-5 saniye
-- **ML Prediction**: ~1-2 saniye
+Bu proje, **yerel dropshipping** stratejisini analiz eder. Yerel dropshipping, geleneksel dropshipping'in yerel bir versiyonudur:
 
-### Memory Usage
-- **Base**: ~150MB
-- **With Chrome (Selenium)**: ~300MB
-- **With ML Models**: ~200MB
+### 🔄 Nasıl Çalışır?
+1. **Satış Öncesi**: Ürünü stokta tutmazsınız
+2. **Satış Sonrası**: Müşteri sipariş verdiğinde, en ucuz platformdan ürünü alırsınız
+3. **Kar Marjı**: Alış fiyatı + komisyon + kar marjı = satış fiyatınız
+4. **Rekabet**: Satış fiyatınız rakiplerden düşük olmalı
 
-## 🔮 Gelecek Planları (v5.0)
+### 📊 Analiz Kriterleri
+- **En Ucuz Fiyat**: Hangi platformdan alınacağı
+- **Komisyon Oranı**: %14 (Trendyol komisyonu)
+- **Kar Marjı**: 100 TL sabit kar(veya kendinize göre ayarlayabilirsiniz)
+- **Rekabet Analizi**: Diğer platformlardaki fiyatlarla karşılaştırma
 
-### 🎯 Öncelikli Özellikler
-- [ ] **Daha gelişmiş ML modelleri** (LSTM, XGBoost)
-- [ ] **Real-time veri güncelleme**
-- [ ] **Dashboard arayüzü**
-- [ ] **Çoklu platform analizi** (Kitapyurdu, D&R)
-- [ ] **Fiyat takip sistemi**
-
-### 🚀 Gelişmiş Özellikler
-- [ ] **Çoklu dil desteği**
-- [ ] **Mobil uygulama**
-- [ ] **Email raporları**
-- [ ] **Webhook entegrasyonları**
-- [ ] **Cache sistemi**
-- [ ] **AI Chatbot** (kitap önerileri)
-
-## 🤝 Katkıda Bulunma
-
-1. Fork yapın
-2. Feature branch oluşturun (`git checkout -b feature/amazing-feature`)
-3. Commit yapın (`git commit -m 'Add amazing feature'`)
-4. Push yapın (`git push origin feature/amazing-feature`)
-5. Pull Request oluşturun
-
-## 📄 Lisans
-
-Bu proje MIT lisansı altında lisanslanmıştır. Detaylar için `LICENSE` dosyasına bakın.
+### ✅ Avantajları
+- **Düşük Risk**: Stok maliyeti yok
+- **Yüksek Esneklik**: Fiyat değişimlerine hızlı adaptasyon
+- **Kolay Başlangıç**: Düşük sermaye gereksinimi
 
 ## 📞 İletişim
 
-- **Proje Sahibi**: [Your Name]
-- **Email**: [your.email@example.com]
-- **GitHub**: [@your-username]
-
-## 🙏 Teşekkürler
-
-- **BTK** - Hackathon organizasyonu
-- **Google** - Gemini AI ve SerpAPI
-- **Open Source Community** - Kullanılan kütüphaneler
+- **Proje Sahibi**: Erkam ÇETKİN
+- **Email**: cetkinerkam17@gmail.com
 
 ---
 
-**Versiyon**: 4.0.0  
-**Son Güncelleme**: 2024  
+**Versiyon**: 5.0.0  
+**Son Güncelleme**: 2025  
 **Python Versiyonu**: 3.10+  
 **Docker**: Destekleniyor  
 **Amazon API**: Entegre edildi  
-**Real ML Data**: Aktif
+**Real ML Data**: Aktif  
+**Dropshipping Analizi**: Yeni Özellik

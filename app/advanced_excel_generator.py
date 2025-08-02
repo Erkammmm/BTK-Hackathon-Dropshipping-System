@@ -296,6 +296,9 @@ class AdvancedExcelGenerator:
         # Yorum analizi sayfası ekle (her zaman oluştur)
         self.create_comments_analysis_sheet(wb, comments_data, gemini_analysis)
         
+        # Sonuç sayfası ekle (dropshipping analizi)
+        self.create_results_sheet(wb, search_results, best_offer, gemini_analysis)
+        
         # Excel dosyasını kaydet
         wb.save(filepath)
         
@@ -630,11 +633,10 @@ class AdvancedExcelGenerator:
         
         # Maliyet hesaplama
         best_price = best_offer.get('price', 0)
-        commission_rate = 0.21
-        shipping_cost = 70
+        commission_rate = 0.14  # %14 komisyon
         profit_margin = 100
         
-        total_cost = best_price + shipping_cost
+        total_cost = best_price  # Kargo maliyeti kaldırıldı
         commission_amount = (best_price + profit_margin) * commission_rate
         suggested_selling_price = total_cost + commission_amount + profit_margin
         net_profit = suggested_selling_price - total_cost
@@ -646,8 +648,7 @@ class AdvancedExcelGenerator:
         
         cost_data = [
             ['Alış Fiyatı', best_price],
-            ['Kargo', shipping_cost],
-            ['Komisyon', commission_amount],
+            ['Komisyon (%14)', commission_amount],
             ['Kar Marjı', profit_margin]
         ]
         
@@ -660,8 +661,8 @@ class AdvancedExcelGenerator:
         pie = PieChart()
         pie.title = "Maliyet Dağılımı"
         
-        data = Reference(ws, min_col=2, min_row=4, max_row=7)
-        labels = Reference(ws, min_col=1, min_row=4, max_row=7)
+        data = Reference(ws, min_col=2, min_row=4, max_row=6)
+        labels = Reference(ws, min_col=1, min_row=4, max_row=6)
         
         pie.add_data(data, titles_from_data=True)
         pie.set_categories(labels)
@@ -926,4 +927,194 @@ class AdvancedExcelGenerator:
         ws.column_dimensions['B'].width = 15
         ws.column_dimensions['C'].width = 15
         ws.column_dimensions['D'].width = 15
-        ws.column_dimensions['E'].width = 15 
+        ws.column_dimensions['E'].width = 15
+    
+    def create_results_sheet(self, wb: Workbook, search_results: Dict, best_offer: Dict, gemini_analysis: Dict):
+        """Sonuç sayfası oluştur (dropshipping analizi)"""
+        ws = wb.create_sheet("Sonuç")
+        
+        # Başlık
+        ws['A1'] = "DROPSHİPPİNG ANALİZİ VE SONUÇLAR"
+        ws['A1'].font = Font(size=16, bold=True, color="FFFFFF")
+        ws['A1'].fill = PatternFill(start_color="27AE60", end_color="27AE60", fill_type="solid")
+        ws.merge_cells('A1:H1')
+        
+        # Fiyat analizi
+        ws['A3'] = "FİYAT ANALİZİ"
+        ws['A3'].font = Font(bold=True, size=12, color="FFFFFF")
+        ws['A3'].fill = PatternFill(start_color="3498DB", end_color="3498DB", fill_type="solid")
+        ws.merge_cells('A3:H3')
+        
+        # En ucuz fiyatı bul
+        all_prices = []
+        for platform, results in search_results.items():
+            if platform != 'best_offer' and isinstance(results, list):
+                for result in results:
+                    price = result.get('price', 0)
+                    if price > 0:
+                        all_prices.append({
+                            'platform': result.get('platform', ''),
+                            'price': price,
+                            'url': result.get('url', '')
+                        })
+        
+        # Fiyata göre sırala
+        all_prices.sort(key=lambda x: x['price'])
+        
+        if all_prices:
+            cheapest_price = all_prices[0]['price']
+            cheapest_platform = all_prices[0]['platform']
+            highest_price = all_prices[-1]['price']
+            
+            ws['A5'] = "En Ucuz Fiyat:"
+            ws['B5'] = f"{cheapest_price} TL ({cheapest_platform})"
+            ws['A6'] = "En Pahalı Fiyat:"
+            ws['B6'] = f"{highest_price} TL"
+            ws['A7'] = "Fiyat Farkı:"
+            ws['B7'] = f"{highest_price - cheapest_price} TL"
+            
+            # Dropshipping hesaplaması
+            commission_rate = 0.14  # %14 komisyon
+            profit_margin = 100  # 100 TL kar marjı
+            
+            # En ucuz fiyata komisyon ve kar marjı ekle
+            dropshipping_price = cheapest_price + (cheapest_price + profit_margin) * commission_rate + profit_margin
+            
+            ws['A9'] = "DROPSHİPPİNG HESAPLAMASI"
+            ws['A9'].font = Font(bold=True, size=12, color="FFFFFF")
+            ws['A9'].fill = PatternFill(start_color="E74C3C", end_color="E74C3C", fill_type="solid")
+            ws.merge_cells('A9:H9')
+            
+            ws['A11'] = "Alış Fiyatı:"
+            ws['B11'] = f"{cheapest_price} TL"
+            ws['A12'] = "Komisyon (%14):"
+            ws['B12'] = f"{(cheapest_price + profit_margin) * commission_rate:.2f} TL"
+            ws['A13'] = "Kar Marjı:"
+            ws['B13'] = f"{profit_margin} TL"
+            ws['A14'] = "Önerilen Satış Fiyatı:"
+            ws['B14'] = f"{dropshipping_price:.2f} TL"
+            
+            # Kar analizi
+            ws['A16'] = "KAR ANALİZİ"
+            ws['A16'].font = Font(bold=True, size=12, color="FFFFFF")
+            ws['A16'].fill = PatternFill(start_color="F39C12", end_color="F39C12", fill_type="solid")
+            ws.merge_cells('A16:H16')
+            
+            # Dropshipping fiyatı en pahalı fiyattan düşük mü?
+            if dropshipping_price < highest_price:
+                ws['A18'] = "✅ TRENDYOL'DA SATIŞ ÖNERİSİ"
+                ws['A18'].font = Font(bold=True, size=14, color="FFFFFF")
+                ws['A18'].fill = PatternFill(start_color="27AE60", end_color="27AE60", fill_type="solid")
+                ws.merge_cells('A18:H18')
+                
+                ws['A20'] = "GEMINI ANALİZİ:"
+                ws['A20'].font = Font(bold=True, size=12)
+                ws['A20'].fill = PatternFill(start_color="D5F4E6", end_color="D5F4E6", fill_type="solid")
+                ws.merge_cells('A20:H20')
+                
+                analysis_text = f"""
+Bu ürün Trendyol'da başarıyla satılabilir! 
+
+📊 FİYAT ANALİZİ:
+• En ucuz alış fiyatı: {cheapest_price} TL ({cheapest_platform})
+• Önerilen satış fiyatı: {dropshipping_price:.2f} TL
+• En yüksek rakip fiyat: {highest_price} TL
+• Potansiyel kar marjı: {dropshipping_price - cheapest_price:.2f} TL
+
+💡 SATIŞ STRATEJİSİ:
+• Bu fiyatla rakiplerden daha uygun fiyatlı olacaksınız
+• Müşteriler bu fiyat farkını fark edecek ve tercih edecek
+• Güvenli kar marjınız korunuyor
+• Hızlı satış potansiyeli yüksek
+
+🚀 ÖNERİLER:
+• Ürünü hemen Trendyol'a ekleyin
+• SEO açıklamasını optimize edin
+• Hızlı kargo vaadi verin
+• Müşteri hizmetlerine önem verin
+                """
+                
+                ws['A22'] = analysis_text
+                ws['A22'].alignment = Alignment(wrap_text=True, vertical='top')
+                ws.merge_cells('A22:H30')
+                
+            else:
+                ws['A18'] = "❌ TRENDYOL'DA SATIŞ RİSKİ"
+                ws['A18'].font = Font(bold=True, size=14, color="FFFFFF")
+                ws['A18'].fill = PatternFill(start_color="E74C3C", end_color="E74C3C", fill_type="solid")
+                ws.merge_cells('A18:H18')
+                
+                ws['A20'] = "GEMINI ANALİZİ:"
+                ws['A20'].font = Font(bold=True, size=12)
+                ws['A20'].fill = PatternFill(start_color="FADBD8", end_color="FADBD8", fill_type="solid")
+                ws.merge_cells('A20:H20')
+                
+                analysis_text = f"""
+Bu ürün Trendyol'da satış için riskli! 
+
+📊 FİYAT ANALİZİ:
+• En ucuz alış fiyatı: {cheapest_price} TL ({cheapest_platform})
+• Önerilen satış fiyatı: {dropshipping_price:.2f} TL
+• En yüksek rakip fiyat: {highest_price} TL
+• Fiyat farkı: {dropshipping_price - highest_price:.2f} TL (çok yüksek)
+
+⚠️ RİSK FAKTÖRLERİ:
+• Fiyatınız rakiplerden çok daha yüksek
+• Müşteriler bu fiyat farkını kabul etmeyecek
+• Satış potansiyeli çok düşük
+• Stok riski yüksek
+
+💡 ALTERNATİF STRATEJİLER:
+• Daha düşük kar marjı ile satış yapın
+• Farklı bir ürün kategorisi deneyin
+• Toplu alım ile maliyeti düşürün
+• Özel kampanyalar ile rekabet edin
+                """
+                
+                ws['A22'] = analysis_text
+                ws['A22'].alignment = Alignment(wrap_text=True, vertical='top')
+                ws.merge_cells('A22:H30')
+        
+        # Detaylı fiyat tablosu
+        ws['A32'] = "DETAYLI FİYAT TABLOSU"
+        ws['A32'].font = Font(bold=True, size=12, color="FFFFFF")
+        ws['A32'].fill = PatternFill(start_color="9B59B6", end_color="9B59B6", fill_type="solid")
+        ws.merge_cells('A32:H32')
+        
+        # Tablo başlıkları
+        headers = ['Platform', 'Fiyat (TL)', 'Durum', 'Dropshipping Potansiyeli']
+        for col, header in enumerate(headers, 1):
+            cell = ws.cell(row=34, column=col, value=header)
+            cell.font = Font(bold=True, color="FFFFFF")
+            cell.fill = PatternFill(start_color="8E44AD", end_color="8E44AD", fill_type="solid")
+        
+        # Fiyat verilerini ekle
+        for row, price_data in enumerate(all_prices, 35):
+            ws.cell(row=row, column=1, value=price_data['platform'])
+            ws.cell(row=row, column=2, value=price_data['price'])
+            
+            # Durum belirleme
+            if price_data['price'] == cheapest_price:
+                ws.cell(row=row, column=3, value="EN UCUZ")
+                ws.cell(row=row, column=3).fill = PatternFill(start_color="27AE60", end_color="27AE60", fill_type="solid")
+                ws.cell(row=row, column=4, value="✅ YÜKSEK")
+                ws.cell(row=row, column=4).fill = PatternFill(start_color="D5F4E6", end_color="D5F4E6", fill_type="solid")
+            elif price_data['price'] == highest_price:
+                ws.cell(row=row, column=3, value="EN PAHALI")
+                ws.cell(row=row, column=3).fill = PatternFill(start_color="E74C3C", end_color="E74C3C", fill_type="solid")
+                ws.cell(row=row, column=4, value="❌ DÜŞÜK")
+                ws.cell(row=row, column=4).fill = PatternFill(start_color="FADBD8", end_color="FADBD8", fill_type="solid")
+            else:
+                ws.cell(row=row, column=3, value="ORTA")
+                ws.cell(row=row, column=4, value="⚠️ ORTA")
+                ws.cell(row=row, column=4).fill = PatternFill(start_color="FEF9E7", end_color="FEF9E7", fill_type="solid")
+        
+        # Sütun genişliklerini ayarla
+        ws.column_dimensions['A'].width = 20
+        ws.column_dimensions['B'].width = 15
+        ws.column_dimensions['C'].width = 15
+        ws.column_dimensions['D'].width = 25
+        
+        # Satır yüksekliklerini ayarla
+        for row in range(22, 31):
+            ws.row_dimensions[row].height = 120 

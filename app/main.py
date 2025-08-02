@@ -6,9 +6,6 @@ from app.gemini_agent_v2 import GeminiAgentV2
 from app.serp_agent import SerpAgent
 from app.excel_generator import ExcelGenerator
 from app.advanced_excel_generator import AdvancedExcelGenerator
-from app.trendyol_scraper import TrendyolScraper
-from app.trendyol_scraper_selenium import TrendyolScraperSelenium
-from app.rapidapi_trendyol import RapidAPITrendyol
 from app.google_trends_scraper import GoogleTrendsScraper
 from app.amazon_comments_api import AmazonCommentsAPI
 
@@ -19,9 +16,6 @@ serp_agent = SerpAgent()
 gemini_agent = GeminiAgentV2()
 excel_generator = ExcelGenerator()
 advanced_excel_generator = AdvancedExcelGenerator()
-trendyol_scraper = TrendyolScraper()
-trendyol_scraper_selenium = TrendyolScraperSelenium()
-rapidapi_trendyol = RapidAPITrendyol()
 google_trends_scraper = GoogleTrendsScraper()
 amazon_comments_api = AmazonCommentsAPI()
 

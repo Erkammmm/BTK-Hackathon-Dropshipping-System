@@ -57,11 +57,11 @@ logs/
 # Excel files (raporlar hariç)
 *.xlsx
 *.xls
-!reports/*.xlsx
+!reports/gelismis_kitap_analizi_Madeline_Miller_Ben_Kirke_20250802_134349.xlsx
 
-# Reports klasörü (sadece Excel dosyalarını koru)
+# Reports klasörü (sadece örnek Excel dosyasını koru)
 reports/
-!reports/*.xlsx
+!reports/gelismis_kitap_analizi_Madeline_Miller_Ben_Kirke_20250802_134349.xlsx
 
 # Chrome driver
 chromedriver.exe
